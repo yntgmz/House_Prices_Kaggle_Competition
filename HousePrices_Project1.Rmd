@@ -40,20 +40,20 @@ library(mice)           #impute missing values
 library(forcats)        #for factor reorder
 library(caret)          #for hot one encoding
 library(plyr)           #to reorder factors 
-library(vip)
+library(vip)            #to show 
 library(psych)          #corplot
 require(Metrics)        #for rmse
 library(DiagrammeR)     #for workflow diagram
 library(gridExtra)      #for tables and graps
-library(data.table)
-library(RColorBrewer)
-library(naniar)      
+library(data.table)     #to create tables
+library(RColorBrewer)   #For graph colors
+library(naniar)         #plot missing values
 
         
 
 ```
 
-# House Prices: Data Preprocessing 
+# House Prices: Advanced Regression Techniques
 
 ## Origin
 
@@ -67,7 +67,7 @@ House Prices: Advanced Regression Techniques is an ongoing Kaggle competition[@k
 
 ## Technical Skills
 
-* Techniques: Data Cleaning, Exploratory Data Analysis, Feature Engineering, Machine Learning, Advanced Regression Techniques
+* Techniques: Data Cleaning, Exploratory Data Analysis, Feature Engineering, Advanced Regression Techniques, Machine Learning
 
 * Program: R
 
