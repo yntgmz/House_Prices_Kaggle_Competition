@@ -1,0 +1,1572 @@
+---
+title: "House Prices: Advanced Regression Techniques"
+author: "Yanet Gomez"
+date: "2/19/2021"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+fig_caption: yes
+number_sections: yes
+df_print: kable
+theme: paper
+bibliography: houseprices.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#Pacakges and libraries______________________________________
+#install.packages("DataExplorer")  #for graphing missing data
+#install.packages("data.table")
+#install.packages("imputeMissings")
+#install.packages("mice") #for RF prediction
+#install.packages("vip") ##For variable imprtance in regularized regression
+#install.packages("naniar") # plot missing values
+#install.packages("mlr3pipelines")  
+
+library(knitr)          #for tables
+library(DataExplorer)   #for plot missing 
+library(RColorBrewer)   #for color palattes
+library(data.table)     #for custom function
+library(ggplot2)        #for general plotting
+library("GGally")       #for ggcor
+library(Rcpp)           #missmap
+library(Amelia)         #missmap
+library(dplyr)          #mutate(), select()
+library(stringr)        #for looking at columns containg "string"
+library(imputeMissings) #impute missing values with median/mode or random forest
+library(mice)           #impute missing values
+library(forcats)        #for factor reorder
+library(caret)          #for hot one encoding
+library(plyr)           #to reorder factors 
+library(vip)
+library(psych)          #corplot
+require(Metrics)        #for rmse
+library(DiagrammeR)     #for workflow diagram
+library(gridExtra)      #for tables and graps
+library(data.table)
+library(RColorBrewer)
+library(naniar)      
+
+        
+
+```
+
+# House Prices: Data Preprocessing 
+
+## Origin
+
+* Semester Date: Spring 2021
+* Class:  Capstone Portfolio (STAT 6382)
+* Program: Master of Science in Data Analytics
+* School: University of Houston Downtown
+
+## Starting Point
+House Prices: Advanced Regression Techniques is an ongoing Kaggle competition[@kagglehouseprices]. This "getting started" competition calls for extensive data pre-processing, feature engineering, and implementation of advanced regression techniques like random forest and gradient boosting. The data-set was made available through the Kaggle website at kaggle.com [@houseprices]. 
+
+## Technical Skills
+
+* Techniques: Data Cleaning, Exploratory Data Analysis, Feature Engineering, Machine Learning, Advanced Regression Techniques
+
+* Program: R
+
+
+## Problem definition:
+Buying a house is a complicated decision making process for a lot of people. As Kaggle.com puts it: "Ask a home buyer to describe their dream house, and they probably won't begin with the height of the basement ceiling or the proximity to an east-west railroad" [@kagglehouseprices]. However, it is in fact, characteristics like these that influence the price of homes. Throughout this project we will explore a plethora of house features from kitchen quality to land slope, and evaluate their contribution to the sale price of homes. With some luck, or rather some data analytics skills, we will gain some insight into the real estate world of pricing residential homes. By understanding the relationship between key features and price, both buyers and sellers can optimize their price negotiations game, and make smarter financial decisions in the process of buying or selling a home. 
+
+This project has three main goals. The first, as defined by Kaggle, is to predict the sales price value for each ID in the test set using advanced regression techniques. The second goal is to identify which features affect sale price the most. Lastly, I would like to explore which data analytics techniques lead to a better prediction in this case. 
+
+
+* Which are the most relevant features that impact sales price?
+* Which data pre-processing techniques improve the predictive value of the data?
+* Which model performs best at predicting price?
+
+ 
+## Data Description 
+The data is the  "Ames Housing Dataset", provided at kaggle.com, which contains information about the sale of individual residential properties in Ames, Iowa from 2006 to 2010. The original dataset was compiled by Dean DeCock for use in data science education, and and is available online here:[Ames Housing Dataset](http://www.amstat.org/publications/jse/v19n3/decock/AmesHousing.xls). 
+
+The data set contains 2919 observations and 80 explanatory variables, plus the variable of interest: Sales Price. Kaggle provided the data split into train and test sets. 
+
+
+## Data Analytics Workflow
+Here is an overview of the data analytics workflow for this project done with packages 'DiagrameR' [@diagramer] and 'webshot' [@webshot].
+
+
+```{r, HP_Workflow, echo=FALSE}
+grViz("
+
+digraph boxes_and_circles {
+graph [layout = dot, rankdir = LR]
+node [shape = rectangle,color=AliceBlue, fontname = Helvetica,
+     style = filled, fillcolor = AliceBlue, fontname=Helvetica, fontsize=14, fontcolor=SlateGray]
+edge [color = SteelBlue,
+     arrowsize = 1, penwidth=1.2]
+rec1 [label = 'Data Collection']
+rec2 [label = 'Data Cleaning']
+rec3 [label =  'Data Transformation']
+rec4 [label = 'Modeling']
+rec5 [label = 'Prediction']
+rec6 [label = 'Submission']
+
+
+rec1-> rec2-> rec3-> rec4-> rec5-> rec6
+}
+      "
+)
+```
+## 1. Data
+The data set contains 2919 observations and 80 explanatory variables, plus the variable of interest: Sales Price. Kaggle provided the data split into train and test sets. Table 1. shows a snippet of the raw data including the first 10 rows and 8 columns plus SalesPrice.
+
+```{r, RawData,echo=FALSE}
+### Import Data
+train_raw<-read.csv("train.csv",stringsAsFactors = TRUE) # 1460 rows,  81 columns
+cat("\n")
+cat("There are", dim(train_raw), "rows/columns in the 'Train' dataset")
+cat("\n")
+test_raw<-read.csv("test.csv", stringsAsFactors = TRUE)
+cat("\n")
+cat("There are", dim(test_raw), "rows/columns in the 'Test' dataset") #1459 rows  80 columns
+cat("\n")
+
+#Save ID column for submissiom
+test_ID <-test_raw$Id
+
+#Merge Datasets for preprocessing steps. Separate into train and test sets later for modeling and prediction. 
+
+test_raw$"SalePrice"<-0                   # Create "SalePrice" feature for test set
+data_full<- rbind(train_raw, test_raw)    # Combine hdb_train and hdb_test
+
+cat("\n")
+cat("There are", dim(data_full) , "rows/columns in the combined dataset")
+cat("\n")
+
+#View(data_full)                           # View entire dataset
+
+#png("data_snippet.png", width=1100,height=500)
+#grid.table(data_full[1:10,1:15])
+#dev.off()
+```
+
+## 2. Data Pre-processing
+The first step is to explore the data and identify any discrepancies that exist by examining the following: 
+\begin{itemize}
+ \item 2.1. Missing Values 
+ \item 2.2. Attribute types 
+ \item 2.3. Distribution, Skewness and Relationships
+ \item 2.4. Dimensionality 
+\end{itemize}
+
+\newpage
+
+### 2.1.  Identifying and Correcting Missing Values
+
+```{r Detect Missing Values, echo=FALSE}
+#1. Find missing values
+
+cat("\n")
+cat("The total number of missing values in the combined data-set is:", sum(is.na(data_full)))
+cat("\n")
+
+col_na<-which(colSums(is.na(data_full)) > 0)
+
+cat("\n")
+cat("The columns containing missing values are:", names(col_na))
+cat("\n")
+
+#How many rows missing per columns 
+cat("\n")
+cat("How many rows missing per column:")
+cat("\n")
+colSums(is.na(data_full))
+
+```
+
+```{r MissValSum,fig.cap = '(ref:Summary of Missing Values per Column/Variable)', echo=FALSE }
+NA_col_list <- sort(col_na, decreasing = T) # arrange the named list with descending order
+
+# Summary of Missing Values per Column/Variable
+
+kable(miss_var_summary(data_full[,NA_col_list]), caption='Summary of Missing Values per Column/Variable')
+
+```
+#### Visualize Missing Values 
+We can see from the heatmap, figure 1,  that about 6% of the data is "missing". 
+
+A simple strategy to deal with missing values is to eliminate the features or examples containing missing values. However, given that there are a total of 13965 missing values spread across 34 features, dropping these objects would mean loss of data critical to the analysis. Instead, we will deal with missing values by imputation using a variety of methods. 
+
+
+```{r, MissingValusViz1, fig.cap = "Missing Values Heatmap" , echo=FALSE}
+#Heat map for missing values of the housing dataset with fucntion missmap from library(Rcpp) 
+missmap(data_full,col = c("blue","gray"), main ="Heatmap showing Missing values")
+```
+
+#### Dealing With Missing Values
+Immediately we can see in Figure 2., that the features "PoolQC", "MiscFeature", "Alley", and "Fence" have a high number of missing values. It might be tempting to drop these features, but with one quick look at the data description provided with the data [@de2011ames] we learn that "NA" in these cases means that the feature is not applicable, so it should be either "0" or "None".
+
+There are two types of missing values in this data-set, some values classified as "NA" are truly missing from the data, the information was not collected. The second type of "NA" means that the feature is not present, so "NA" in this case means either 'Zero' for numerical features,  'None' for categorical features, or 'No' for binary features. By examining the data and reading the data description provided [@de2011ames], we are able to determine each case. 
+
+
+```{r, HP_NA_FIG1, fig.cap= "All Missing Values. There are a total of 13965 missing values, which amount to 6 % of the data. The missing values are spread across 34 variables.", echo=FALSE}
+gg_miss_var(data_full[,NA_col_list], show_pct = FALSE )+theme(text = element_text(size = 8,))
+```
+
+#### Manual Imputation of NAs due to Inconsistent Values
+By exploring the columns containing missing values, we discover that there are a few inconsistencies in the raw data, for example for the feature MasVnrType, there is a missing value for row ID=2611, but the column "MasVnrArea" shows a value, this obviously indicates that there is a MasVnrType associated with this instance, so instead of replacing it with "None", we will impute the missing value with the most common value for this feature. There are a few other cases like this in the data, listed in Table 2., where we will impute the missing values in similar fashion. 
+
+
+```{r HPMan, echo=FALSE}
+#Masonry Missing values
+
+masonry_features <- names(data_full)[sapply(names(data_full), function(x) str_detect(x, "Mas"))]
+
+mas_na<-which(is.na(data_full$MasVnrType) & data_full$MasVnrArea >0)
+data_full[2611,masonry_features]
+
+```
+
+1. Starting with groups of related features for garage, basement, pool and masonry features to identify NA values due to inconsitencies, and inpute missing values manually. 
+
+
+```{r,HP_inconVal, echo=FALSE}
+
+Inconsitent_Values<- c("BsmtQual", "BsmtCond",  "GarageQual","GarageFinish", "GarageCond",  "GarageYrBlt","BsmtCond", "PoolQC", "MasVnrArea")
+Inconsitent_Values<-tibble("Feature"=Inconsitent_Values, "Method"=rep("Manual Imputation", length(Inconsitent_Values)))
+kable(Inconsitent_Values, caption = "Inconsistent Values")
+
+```
+
+```{r, Garage Features Missing Values, echo=FALSE}
+
+garage_features <- names(data_full)[sapply(names(data_full), function(x) str_detect(x, "Garage"))]
+#View(data_full[which(is.na(data_full$GarageCond)), garage_features]) # To look at all garage features containing missing values 
+count(data_full[which(is.na(data_full$GarageCond)), garage_features]) #159
+data_full[2127,garage_features]
+
+cat("\n")
+cat("Row 2127 has a garage, given that it has values for area(360), type(Detchd), and GarageCars(1), so fill in the 'GarageQual','GarageFinish', and 'GarageCond' with most common values.")
+cat("\n")
+
+names(sapply(data_full[which( data_full$GarageCars == 1 & data_full$GarageType=="Detchd" ) ,garage_features], function(x) sort(table(x),  decreasing=TRUE)[1])) #To get mode based onGarageCars and GarageTyp
+
+data_full[2127,'GarageQual']    = 'TA'
+data_full[2127, 'GarageFinish'] = 'Unf'
+data_full[2127, 'GarageCond']   = 'TA'
+
+data_full[2127,garage_features]
+
+#We can see that row 2577 has no garage,so we can fill in garage type with none.
+data_full[2577,garage_features]
+#Check and correct levels in Garage Type
+levels(data_full$GarageType)
+data_full$GarageType<-factor(data_full$GarageType, levels=c("None","2Types","Attchd",  "Basment","BuiltIn","CarPort","Detchd" ), ordered=FALSE)
+#Update Garage type for row 2577
+data_full[2577, 'GarageType'] = 'None'
+
+cat("\n")
+cat("There is an error in GarageYrBlt, from the summary we see a year 2207. We will update to 2007")
+cat("\n")
+
+summary(data_full$GarageYrBlt)
+data_full$GarageYrBlt[2593] #row 2593, year 2207
+data_full$GarageYrBlt[data_full$GarageYrBlt==2207] <- 2007
+
+# Fill in year garage built in the same year when house was built. ***
+
+cat("\n")
+cat("GarageYrBlt has missing values:", sum(is.na(data_full$GarageYrBlt)) )
+cat("\n")
+
+data_full$GarageYrBlt[is.na(data_full$GarageYrBlt)]<-data_full$YearBuilt[is.na(data_full$GarageYrBlt)]
+
+cat("\n")
+cat("After inputing NA's with year YearBuilt values, GarageYrBlt has", sum(is.na(data_full$GarageYrBlt)), "missing values")
+cat("\n")
+
+summary(data_full$GarageYrBlt)
+
+```
+
+
+```{r, Basement Features Missing Values, echo=FALSE}
+#Basement features missing values ________________________________________________________________________
+
+basement_features <- names(data_full)[sapply(names(data_full), function(x) str_detect(x, "Bsmt"))]
+#View(data_full[is.na(data_full$BsmtCond), basement_features]) 
+
+cat("\n")
+cat("From viewing at all the basement columns we can see that basement condition is missing in rows 2041, 2186, 2525, and will replace with most the common feature for each column")
+cat("\n")
+
+data_full[c(2041, 2186,2525),basement_features]
+
+
+#names(which.max(table(data_full$BsmtCond)))
+data_full[c(2041,2186, 2525),'BsmtCond']=names(which.max(table(data_full$BsmtCond)))
+
+cat("\n")
+cat("After inputing with most common values, NA's are eliminated for rows congtainign missing values in Bsmt features")
+cat("\n")
+
+data_full[c(2041, 2186,2525), basement_features]
+
+```
+
+
+```{r, Pool Features Missing Values, echo=FALSE}
+# Pool missing values_______________________________________________________________________________
+
+pool_features <- names(data_full)[sapply(names(data_full), function(x) str_detect(x, "Pool"))]
+
+cat("\n")
+cat("There are three pools that where quality are missing, so we will fill the area in with mean based on the area of the pool")
+cat("\n")
+
+data_full[c(2421,2504,2600),pool_features]
+
+
+pool_na<-which(is.na(data_full$PoolQC) & data_full$PoolArea >0)
+
+aggregate(data=data_full, PoolArea~PoolQC, mean, na.rm=TRUE)
+
+data_full$PoolArea[which(is.na(data_full$PoolQC) & data_full$PoolArea >0)]
+
+data_full$PoolQC[data_full$Id == 2421] <- "Ex"
+data_full$PoolQC[data_full$Id == 2504] <- "Ex"
+data_full$PoolQC[data_full$Id == 2600] <- "Fa"
+
+cat("\n")
+cat("After inputing with most common value based on the area, NA's are eliminated.")
+cat("\n")
+
+data_full[c(2421,2504,2600),pool_features]
+```
+
+
+```{r, Mansory Features Missing Values, echo=FALSE}
+#Masonry Missing values_________________________________________________________________________
+
+masonry_features <- names(data_full)[sapply(names(data_full), function(x) str_detect(x, "Mas"))]
+
+cat("\n")
+cat("There is a missing value for row ID=2611 in the MasVnrType column, we will replace with most common MasVnrType")
+cat("\n")
+
+mas_na<-which(is.na(data_full$MasVnrType) & data_full$MasVnrArea >0)
+mas_na #ID=2611
+
+data_full[2611,masonry_features]
+
+data_full$MasVnrArea[which(is.na(data_full$MasVnrType) & data_full$MasVnrArea >0)]  #198
+
+aggregate(data=data_full, MasVnrArea~MasVnrType, mean, na.rm=TRUE)
+
+names(which.max(table(data_full$MasVnrType)))
+
+summary(data_full$MasVnrType)  #most common is BrkFace
+
+data_full$MasVnrType[data_full$Id == 2611] <- "BrkFace"
+
+cat("\n")
+cat("After inputing with most common value MasVnrType NA's are eliminated.")
+cat("\n")
+
+data_full[2611,masonry_features]
+
+
+```
+#### Imputation with Mode for Categorical Features with a Few NAs
+For some of the categorical features only missing a few values, we filled in the missing values with the most commonly occurring attribute value. Specially because for many of these the most frequent category was already over-represented, so it is pretty safe to assume that the missing values are more likely to be in the most common category. 
+
+^[The graphs were produced with ggplot() function from package 'ggplot2' [@ggplot2].]
+
+```{r plotcat, echo=FALSE}
+
+ut<-ggplot(data_full)+aes(Utilities)+ labs(title="Utilities")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))
+
+func<-ggplot(data_full)+aes(Functional)+ labs(title="Functional")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))
+
+elec<-ggplot(data_full)+aes(Electrical)+ labs(title="Electrical")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))
+
+sale<-ggplot(data_full)+aes(SaleType)+ labs(title="SaleType")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))
+
+
+kitch<-ggplot(data_full)+aes(KitchenQual)+ labs(title="KitchenQual")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))
+
+ext1<-ggplot(data_full)+aes(Exterior1st)+ labs(title="Exterior1st")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))
+
+ext2<-ggplot(data_full)+aes(Exterior2nd)+ labs(title="Exterior2nd")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))
+
+
+grid.arrange(ut, func, elec, sale,
+             ncol = 2, nrow = 2)
+
+#grid.arrange(kitch, ext1, ext2,ncol = 2, nrow = 2)
+
+```
+```{r, HPFewMiss, echo=FALSE}
+Few_Missing<-c("Utilities", "Functional", "Exterior1st", "Exterior2nd", "Electrical", "KitchenQual", "SaleType")
+Few_Missing<-tibble("Feature"=Few_Missing, "Method"=rep("Mode", length(Few_Missing)))
+kable(Few_Missing, caption = "Few NAs")
+```
+
+
+```{r, Replace with most common value, fig.cap= "Features with Missing Values",  echo=FALSE, fig.height = 7}
+
+#Replace with most common value since these are missing very few values: 
+
+na_m <- c( "Utilities", "Functional", "Exterior1st", "Exterior2nd", "Electrical", "KitchenQual", "SaleType")
+
+cat("\n")
+cat("Number of missing values per column to be replaced by most common value")
+cat("\n")
+col_na<-which(colSums(is.na(data_full[,na_m ])) > 0);col_na
+
+data_full[,na_m] <- apply(data_full[,na_m], 2,
+                         function(x) {replace(x, is.na(x), names(which.max(table(x))))})
+
+```
+
+#### Imputation with "None" for Categorical Features where NA means Feature is not Present
+
+According to the data description file [@de2011ames] for the categorical features listed in Table 5., NA means that the feature is not present in the house. For example, the house doesn't have a garage. For these features the NA values were replaced with "None". 
+
+```{r, HPCat, echo=FALSE}
+Categorical <- c("GarageFinish", "GarageQual", "GarageType", "GarageCond", "BsmtCond", "BsmtExposure", "BsmtQual", "BsmtFinType1", "BsmtFinType2", "FireplaceQu", "EnclosedPorch","MiscFeature","Alley", "Fence", "MasVnrType")
+
+Categorical<-tibble("Feature"=Categorical, "Method"=rep("None", length(Categorical)))
+kable(Categorical, caption = "Categorical Features where NA means 'None'")
+```
+
+
+```{r, Categorical Features Missing Values, echo=FALSE}
+#Replace with None, as in feature is not present:________________________________
+na_none <- c("GarageFinish", "GarageQual", "GarageType", "GarageCond", "BsmtCond", "BsmtExposure", "BsmtQual", "BsmtFinType1", "BsmtFinType2", "FireplaceQu", "EnclosedPorch","PoolQC","MiscFeature","Alley", "Fence", "MasVnrType")
+
+data_full[,na_none] <- apply(data_full[,na_none], 2,
+                          function(x) {replace(x, is.na(x), "None")})
+
+```
+#### Imputation with Zero (0) for Numerical Features where NA means Feature is not Present
+According to the data description file [@de2011ames] for the numerical features listed in Table 3.  NA means that the feature is not present in the house, so we replaced NA with the number zero for these features. 
+```{r HPCont,echo=FALSE }
+
+Continous <- c("BsmtFinSF1","BsmtFinSF2", "BsmtUnfSF", "TotalBsmtSF", "BsmtFullBath", "BsmtHalfBath","GarageCars","GarageArea", "MasVnrArea")
+Continous <- tibble("Feature"=Continous, "Method"=rep("0",length(Continous)))
+
+kable(Continous, caption = "NA means '0'")
+
+```
+
+#### Imputation with estimation for Features with Large Number of Missing Values
+
+Lastly, we were left with two features as seen in Figure 3. LotFrontage, which captures the linear feet of street-connected to the property; and MSZoning, which indicates the  different zoning classifications ranging  from agricultural to residential. Because these features had a large percentage of missing values, it might be better to estimate their value based on other attributes. I used the mice package[@mice], which uses a Random Forest algorithm to estimate the missing values.
+
+
+```{r, Numerical Features Missing Values, echo=FALSE}
+#Replace with O, since these features are integers, and NA means there is zero _________
+na_z <- c("BsmtFinSF1","BsmtFinSF2", "BsmtUnfSF", "TotalBsmtSF", "BsmtFullBath", "BsmtHalfBath","GarageCars","GarageArea", "MasVnrArea")
+
+
+data_full[,na_z] <- apply(data_full[,na_z], 2,
+                          function(x) {replace(x, is.na(x), 0)})
+
+cols_missing_values2<-data_full[which(colSums(is.na(data_full))>0)]
+
+plot_missing(cols_missing_values2)
+```
+^[The graph was produced with function plot_missing() from package 'DataExplorer' [@plotmissing].]
+
+```{r, HPManyMiss, echo=FALSE}
+Many_Missing<-c("LotFrontage", "MSZoning")
+Many_Missing <- tibble("Feature"=Many_Missing, "Method"=rep("Prediction",length(Many_Missing)));
+kable(Many_Missing,caption = "Large Number of Missing Values")
+
+```
+
+```{r, Other Features Missing Values, echo=FALSE}
+#Impute LotFrontage (This takes a long time to run)
+library(mice)
+set.seed(123)
+mice_rf_mod<- mice(data_full[, !names(data_full) %in% c('Id', 'SalePrice')], method ='rf', printFlag = FALSE)
+mice_output <- complete(mice_rf_mod)
+
+#Inpute LotFrontage
+sum(is.na(data_full$LotFrontage))
+data_full$LotFrontage[is.na(data_full$LotFrontage)] <- mice_output$LotFrontage[is.na(data_full$LotFrontage)]
+sum(is.na(data_full$LotFrontage))
+
+
+#Inpute MSZoning
+set.seed(123)
+sum(is.na(data_full$MSZoning))
+data_full$MSZoning[is.na(data_full$MSZoning)] <- mice_output$MSZoning[is.na(data_full$MSZoning)]
+sum(is.na(data_full$MSZoning))
+
+```
+##### After imputing values for all NA's, confirm all  missing values are now cleared.
+
+```{r, fig.height = 5, fig.cap= "Final Missing Values HeatMap", echo=FALSE}
+### All NA's removed ________________________________________
+
+sum(is.na(data_full))                 # All Na's removed.
+missmap(data_full,col = c("red","gray"), main ="Heatmap showing Missing values")
+
+#cols_missing_values2<-data_full[which(colSums(is.na(data_full))>0)]
+#plot_missing_2(cols_missing_values2)
+
+colSums(is.na(data_full))
+
+
+
+```
+
+### 2.2. Correct Data Types
+The next step in pre-processing, after all the NA values have been cleared, is to identify and correct data type inconsistencies. 
+The raw data shows that there are  43 factors, 37 integers, and 1 numeric data types. However, the documentation on the data [@de2011ames] says that the data-set consist of 20 continuous features that refer to area dimensions, 14 discrete features that quantify the number of items in the house, 23 nominal categorical features that refer to types of dwellings, materials and conditions, and 23 ordinal categorical features that rate various property related items. 
+The raw data shows that there are  43 factors, 37 integers, and 1 numeric data types. However, the documentation on the data [@de2011ames] says that the dataset consits of the folowwing data types:
+
+\begin{itemize}
+
+  \item 20 Continous Features: LotFrontage, MasVnrArea, BsmtFinSF1, BsmtFinSF2, BsmtUnfSF, totalBsmtSF, GarageArea,X1stFlrSF, X2ndFlrSF, LowQualFinSF, GrLivArea, X3SsnPorch, PoolArea, WoodDeckSF, SalePrice ,EnclosedPorch, ScreenPorch, LotArea,  MiscVal, OpenPorchSF
+
+  \item 14 Discrete Features, BsmtFullBath,BsmtHalfBath,FullBath, HalfBath, BedroomAbvGr, KitchenAbvGr, TotRmsAbvGrd, Fireplaces, GarageCars,"YearBuilt",YearRemodAdd, ID, 
+  
+  \item 23 Nominal Categorical Features: Neighborhood, SaleCondition, HouseStyle, Street, Alley, LotShape, LandContour, LandSlope, Condition1, Condition2, BldgType, RoofStyle, RoofMatl, Exterior1st, Exterior2nd, Foundation, BSMTExposure, Heating, CentralAir, GarageType, PavedDrive, MiscFeature, SaleType, MSSubClass
+  
+  \item 23 Ordinal Categorical Features: Ordinal Features: "Utilities", "LandSlope", "ExterQual", "ExterCond","BsmtQual","BsmtCond","BsmtExposure","BsmtFinType1","BsmtFinType2",
+"HeatingQC","Electrical","KitchenQual","Functional","FireplaceQu", "GarageFinish","GarageQual","GarageCond","PavedDrive","PoolQC","Fence","OverallQual","OverallCond"
+
+\end{itemize}
+
+
+```{r, Data Type Discrepancy Detection, echo=FALSE}
+
+#How the data should be :
+Cont_Features_20<- c("LotFrontage", "MasVnrArea", "BsmtFinSF1", "BsmtFinSF2", "BsmtUnfSF", "TotalBsmtSF", "GarageArea", "X1stFlrSF", "X2ndFlrSF", "LowQualFinSF", "GrLivArea", "X3SsnPorch", "PoolArea", "WoodDeckSF", "SalePrice" ,"EnclosedPorch", "ScreenPorch", "LotArea",  "MiscVal", "OpenPorchSF", " ", " ", " ", " ")
+
+DiscFeatures_14<- c("BsmtFullBath","BsmtHalfBath","FullBath", "HalfBath", "BedroomAbvGr", "KitchenAbvGr", "TotRmsAbvGrd", "Fireplaces", "GarageCars","YearBuilt","YearRemodAdd", "ID", "MoSold ", "YrSold ", " "," ", " ", " ",  " ", " ", " ", "", "", " ")
+
+Nom_Categorical_23<- c("Neighborhood", "SaleCondition", "HouseStyle", "Street", "Alley", "LotShape", "LandContour", "LandSlope", "Condition1", "Condition2", "BldgType", "RoofStyle", "RoofMatl", "Exterior1st", "Exterior2nd", "Foundation", "BsmtExposure", "Heating", "GarageType", "PavedDrive", "MiscFeature", "SaleType", "MSSubClass","MSZoning")
+  
+Ord_Categorical_23<- c("Utilities", "LandSlope", "ExterQual", "ExterCond","BsmtQual","BsmtCond","BsmtExposure","BsmtFinType1","BsmtFinType2",
+"HeatingQC","CentralAir","Electrical","KitchenQual","Functional","FireplaceQu", "GarageFinish","GarageQual","GarageCond","PavedDrive","PoolQC","Fence","OverallQual","OverallCond", " " )
+
+
+data_types<-data.frame(Cont_Features_20,DiscFeatures_14,Nom_Categorical_23,Ord_Categorical_23);data_types
+kable(data_types,caption = "Data Types- How the Data SHould Look")
+
+#str(data_full)
+
+cat("\n")
+cat("What the data actually shows:")
+cat("\n")   
+
+
+cat("\n")
+cat("Names of Features: ")
+cat("\n")   
+
+#names(data_full)
+
+#table(sapply(data_full, class))                           # number of features
+
+int_var <- which(lapply(data_full,class) == "integer")     # Integer features
+
+cat("\n")
+cat("Numerical Features (int):", names(int_var))
+cat("\n")
+
+cat("\n")
+tar_var <- which(lapply(data_full, class) == "numeric")     # Target feature: numeric
+cat("Numerical Features(num):", names(tar_var))
+cat("\n")
+
+cat("\n")
+fact_var <- which(lapply(data_full, class) == "factor")    # Categorical features
+cat("Categorical Features:", names(fact_var))
+cat("\n")
+
+cat("\n")
+fact_var <- which(lapply(data_full, class) == c("character"))    # Categorical features
+cat("Character features:", names(fact_var))
+cat("\n")
+
+
+
+
+```
+
+1. The first step is to convert the numeric features to the appropriate data type. 
+
+Continous(Numeric,20): LotFrontage, MasVnrArea, BsmtFinSF1, BsmtFinSF2, BsmtUnfSF, totalBsmtSF, GarageArea,X1stFlrSF, X2ndFlrSF, LowQualFinSF, GrLivArea, X3SsnPorch, PoolArea, WoodDeckSF, SalePrice ,EnclosedPorch, ScreenPorch, LotArea,  MiscVal, OpenPorchSF
+
+Discrete(integer,14): BsmtFullBath,BsmtHalfBath,FullBath, HalfBath, BedroomAbvGr, KitchenAbvGr, TotRmsAbvGrd, Fireplaces, GarageCars, ID
+
+2. Second step, is to convert missclassified numeric features to categorical. 
+From the data description provided by Kaggle.com, we know that we need to convert the following features to categorical:"OverallQual","OverallCond", "MoSold", "YrSold", "GarageYrBlt", YearBuilt
+
+3. The third step is to add levels to ordinal categorical features. 
+
+Ordinal Features (23): "Utilities", "ExterQual", "YearBuilt" "ExterCond","BsmtQual","BsmtCond","BsmtExposure","BsmtFinType1","BsmtFinType2",
+"HeatingQC","Electrical","KitchenQual","Functional","FireplaceQu", "GarageFinish","GarageQual","GarageCond","PavedDrive","PoolQC","Fence","OverallQual","OverallCond"
+
+Non-ordinal Categorical features: MoSold, YrSold, YearRemodAdd, MSSubClass
+
+4. Lastly,  One hot-encode unordered categorical features: Neighborhood, SaleCondition, HouseStyle, Street, Alley, LotShape, LandContour 
+
+
+```{r, Data Type Discrepancy Correction, echo=FALSE}
+
+#1. Convert continous to numeric
+names(data_full)
+str(data_full)
+to_num <-c( "LotFrontage", "MasVnrArea", "BsmtFinSF1", "BsmtFinSF2", "BsmtUnfSF", "TotalBsmtSF", "GarageArea","X1stFlrSF", "X2ndFlrSF", "LowQualFinSF", "GrLivArea", "X3SsnPorch", "PoolArea", "WoodDeckSF", "SalePrice" ,"EnclosedPorch", "ScreenPorch", "LotArea",  "MiscVal", "OpenPorchSF")
+
+data_full[,to_num] <- lapply(data_full[,to_num], as.numeric)
+str(data_full[,to_num])
+
+to_int<-c("BsmtFullBath","BsmtHalfBath","FullBath", "HalfBath", "BedroomAbvGr", "KitchenAbvGr", "TotRmsAbvGrd", "Fireplaces", "GarageCars", "MoSold", "YrSold","YearRemodAdd","GarageYrBlt","YearBuilt")
+
+data_full[,to_int] <- lapply(data_full[,to_int], as.integer)
+str(data_full[,to_int])
+
+#2. Convert to nominal categorical 
+
+nom_to_cat <-c("MasVnrType","MSSubClass", "Neighborhood", "SaleCondition", "HouseStyle", "Street", "Alley", "LotShape", "LandContour", "LandSlope", "Condition1", "Condition2", "BldgType", "RoofStyle", "RoofMatl", "Exterior1st", "Exterior2nd", "Foundation", "BsmtExposure", "Heating", "GarageType", "PavedDrive", "MiscFeature", "SaleType")
+
+data_full[,nom_to_cat] <- lapply(data_full[,nom_to_cat], factor)
+
+
+#3. Add order to levels for ordinal variables 
+
+
+#Ordinal Features: "Utilities", "ExterQual", "YearBuilt" #"ExterCond","BsmtQual","BsmtCond","BsmtExposure","BsmtFinType1","BsmtFinType2",
+#"HeatingQC","Electrical","KitchenQual","Functional","FireplaceQu", #"GarageFinish","GarageQual","GarageCond","PavedDrive","PoolQC","Fence","OverallQual","OverallCond"
+
+
+data_full$Utilities<-factor(data_full$Utilities,levels=c("ELO","NoSeWa","NoSewr","AllPub"), ordered=TRUE)
+
+data_full$ExterQual<-factor(data_full$ExterQual, levels=c("Po","Fa","TA","Gd","Ex"), ordered=TRUE)
+
+data_full$ExterCond<-factor(data_full$ExterCond, levels=c("Po","Fa","TA","Gd","Ex"), ordered=TRUE)
+
+data_full$FireplaceQu<-factor(data_full$FireplaceQu, levels=c("None","Po","Fa","TA","Gd","Ex"), ordered=TRUE)
+
+data_full$Functional<-factor(data_full$Functional,levels=c("Sal", "Sev", "Maj2", "Maj1","Mod","Min2","Min1","Typ"), ordered=TRUE)
+
+data_full$PoolQC<-factor(data_full$PoolQC,levels=c("None","Fa","TA","Gd","Ex"), ordered=TRUE)
+
+data_full$BsmtCond<-factor(data_full$BsmtCond, levels=c("None","Po","Fa","TA","Gd","Ex"), ordered=TRUE)
+
+data_full$BsmtQual<-factor(data_full$BsmtQual,levels=c("None","Po","Fa","TA","Gd","Ex"), ordered=TRUE)
+
+data_full$BsmtExposure<-factor(data_full$BsmtExposure, levels=c("None", "No", "Mn", "Av", "Gd"), ordered=TRUE)
+
+data_full$BsmtFinType1<-factor(data_full$BsmtFinType1, levels=c("None","Unf","LwQ","Rec","BLQ","ALQ","GLQ"), ordered=TRUE)
+
+data_full$BsmtFinType2<-factor(data_full$BsmtFinType2, levels=c("None","Unf","LwQ","Rec","BLQ","ALQ","GLQ"), ordered=TRUE)
+
+data_full$HeatingQC<-factor(data_full$HeatingQC, levels=c("Po", "Fa", "TA", "Gd", "Ex"), ordered=TRUE)
+
+data_full$KitchenQual<-factor(data_full$KitchenQual, levels=c("Po", "Fa", "TA", "Gd", "Ex"), ordered=TRUE)
+
+data_full$GarageQual<-factor(data_full$GarageQual, levels=c("None","Po","Fa","TA","Gd","Ex"), ordered=TRUE)
+
+data_full$GarageCond<-factor(data_full$GarageCond, levels=c("None","Po","Fa","TA","Gd","Ex"), ordered=TRUE)
+
+data_full$Electrical<-factor(data_full$Electrical, levels=c("Mix","FuseP","FuseF","FuseA","SBrkr"), ordered=TRUE)
+
+data_full$GarageFinish<-factor(data_full$GarageFinish, levels=c("None","Unf","RFn","Fin"), ordered=TRUE)
+
+data_full$PavedDrive<-factor(data_full$PavedDrive, levels=c("N","P","Y"), ordered=TRUE)
+
+data_full$Fence<-factor(data_full$Fence, levels=c("None","MnWw","GdWo", "MnPrv", "GdPrv"), ordered=TRUE)
+
+data_full$OverallQual<-factor(data_full$OverallQual, levels=c("1", "2","3","4", "5", "6", "7", "8", "9", "10"), ordered=TRUE)
+
+data_full$OverallCond<-factor(data_full$OverallCond, levels=c("1", "2","3","4", "5", "6", "7", "8", "9", "10"), ordered=TRUE)
+
+data_full$GarageType<-factor(data_full$GarageType, levels=c("None","2Types","Attchd",  "Basment","BuiltIn","CarPort","Detchd" ), ordered=FALSE)
+
+data_full$CentralAir<-factor(data_full$CentralAir, levels=c("N","Y"), ordered=TRUE)
+
+
+
+
+
+```
+##### Confirm all features are now approrpiately classified by their data type.
+
+  \item 20 Continous Features
+  \item 14 Discrete Features
+  \item 23 Nominal Features
+  \item 23 Ordinal Features
+
+```{r, }
+integer_var <- which(lapply(data_full,class) == "integer")     # Integer features
+
+cat("\n")
+cat("Discrete Features:", names(integer_var))
+cat("\n")
+
+cat("\n")
+numeric_var <- which(lapply(data_full, class) == "numeric")     # Target feature: numeric
+cat("Continous Feature:", names(numeric_var ))
+cat("\n")
+
+cat("\n")
+factor_var <- which(lapply(data_full, class) == "factor")    # Categorical features
+cat("Nominal Categorical Features:", names(factor_var))
+cat("\n")
+
+cat("\n")
+factor_var2 <- which(sapply(data_full, is.ordered))  # Categorical features
+cat("Ordered Categorical Features:", names(factor_var2))
+cat("\n")
+
+
+char_var <- which(lapply(data_full, class) == "character") 
+
+```
+
+### 2.3. Feature Transformation
+
+With clean data in the correct form, it is time to start the Exploratory Data Analysis (EDA). By visualizing the data we hope to uncover interesting patterns and relationships which we could use to enhance the predictive value of the features via transformation or new feature creation. 
+
+ 
+#### Visualizing the Distribution and Spread of Target Feature : SalesPrice 
+
+The histogram of the "SalesPrice" feature in Figure 4. shows a few very large values on the right, making the distribution of the data right skewed. Since the goal is to predict the continuous numerical variable "SalesPrice" with regression models, it might be useful to transform it, since one of the assumptions of regression  analysis is that the error between the observed and expected values (the residuals) should be normally distributed, and violations of this assumption often stem from a skewed response variable. We can make the distribution more normal by taking the natural logarithm, since in a right-skewed distribution where there are a few very large values, the log transformation helps bring these values into the center. After applying the log transformation, as seen in  Figure 5., the distribution looks more symmetrical.
+```{r, SalePriceHistogram, echo=FALSE}
+#Create a copy of the whole dataset to work from here on out
+data_2<-data_full  
+#Create a set that includes only the training examples
+data_2_train<-data_2[1:1460,]
+
+par(mfrow=c(1,1))
+ggplot(data_2_train, aes(SalePrice)) + ggtitle("Target Feature: SalePrice")+
+geom_histogram(fill="#053061", alpha=.5, color="#F5F5F5" , bins = 30)+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE))+
+        geom_vline(aes(xintercept = mean(SalePrice), 
+                   color = "mean"), linetype = "dashed", size = .7) +
+        geom_vline(aes(xintercept = median(SalePrice), 
+                   color = "median"), linetype = "dashed", size = .7) +
+        scale_color_manual(name = "Central Tendency", values = c(mean = "#67001F", median = "#01665E"))
+                                                             
+
+#Log transform the Target Feature
+data_2_log<-data_2_train
+data_2_log$SalePrice<-log(data_2_log$SalePrice)
+
+ggplot(data_2_log, aes((SalePrice))) + ggtitle("SalePrice with Log Transformation")+
+geom_histogram(fill="#053061", alpha=.5, color="#F5F5F5", bins = 30)+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) +
+        geom_vline(aes(xintercept = mean(SalePrice), 
+                   color = "mean"), linetype = "dashed", size = .7) +
+        geom_vline(aes(xintercept = median(SalePrice), 
+                   color = "median"), linetype = "dashed", size = .7) +
+        scale_color_manual(name = "Central Tendency", values = c(mean = "#67001F", median = "#01665E"))
+
+
+
+```
+
+
+###### Features Highly Correlated with Sales Price 
+
+Given the large number of features in the data-set, we will focus our data engineering efforts on those features which are highly correlated with our variable of interest. 
+
+For continuous features, the correlation plot shows Garage Area, Great Living Room Area, First Floor SF, Total Basement SF, and Masonry Veneer Area have a strong positive correlation with Sale Price. 
+
+
+```{r}
+ggcorr(data_2_train[,numeric_var], label = TRUE, label_size = 2.9, hjust = 1, layout.exp = 2)+ ggplot2::labs(title = "Continous Features and Sale Price Correlation Plot")
+
+```
+^[The correlation plot was produced with the ggcorr() function from package 'GGally' [@GGally].]
+
+From the histograms we can see that many of the continuous independent variables are right skewed, similar to the response, so it might be a good idea to normalize these prior to modeling, since many algorithms perform better with normalized data because it improves the numerical stability of the model and reduces training time (Zhang_2019). 
+
+
+```{r, ContinousFeatures2}
+
+
+#Garage Area
+gar_a<-ggplot(data_2_train, aes(x=GarageArea)) + ggtitle("Garage Area")+ geom_histogram(aes(y=..density..), bins = 30, colour="#F5F5F5", fill="#053061", alpha=.5) + geom_density(adjust = 5, colour= "#053061") +  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE))+
+        geom_vline(aes(xintercept = mean(GarageArea), 
+                   color = "mean"), linetype = "dashed", size = .7) +
+        geom_vline(aes(xintercept = median(GarageArea), 
+                   color = "median"), linetype = "dashed", size = .7) +
+        scale_color_manual(name = "Central Tendency", values = c(mean = "#B2182B" , median = "#01665E"))
+
+# Living Area
+liv_a<-ggplot(data_2_train, aes(x=GrLivArea)) + ggtitle("Living Room Area")+ geom_histogram(aes(y=..density..), bins = 30, colour="#F5F5F5", fill="#053061", alpha=.5) + geom_density(adjust = 5, colour= "#053061") 
+
+
+#First Floor SF
+first_f<-ggplot(data_2_train, aes(x=X1stFlrSF)) + ggtitle("First Floor SF")+ geom_histogram(aes(y=..density..), bins = 30, colour="#F5F5F5", fill="#053061", alpha=.5) + geom_density(adjust = 5, colour= "#053061") 
+
+#Total Basement SF
+
+tot_bas<-ggplot(data_2_train, aes(x=TotalBsmtSF)) + ggtitle("Total Basement SF")+ geom_histogram(aes(y=..density..), bins = 30, colour="#F5F5F5", fill="#053061", alpha=.5) + geom_density(adjust = 5, colour= "#053061") 
+
+#and Masonry Veneer Area
+
+mans_a<-ggplot(data_2_train, aes(x=MasVnrArea)) + ggtitle("MasVnrArea")+ geom_histogram(aes(y=..density..), bins = 30, colour="#F5F5F5", fill="#053061", alpha=.5) + geom_density( colour= "#053061")
+
+grid.arrange(mans_a, liv_a, first_f, tot_bas, 
+             ncol = 2, nrow = 2)
+
+```
+^[The histograms were produced with ggplot() function from package 'ggplot2' [@ggplot2].]
+
+The correlation plot for the discrete features in Figure 8. shows that YearBuilt, YearRemodAdd, GarageYearBuilt, GarageCars, FullBath, FirePlaces, and TotRmsAbvGrd are strongly and positively correlated with SalePrice: 
+```{r, Correlation,echo=FALSE}
+
+ggcorr(data_2_train[,c(integer_var, 81)], label = TRUE, label_size = 2.9, hjust = 1, layout.exp = 2)+ ggplot2::labs(title = "Discrete Features and Sale Price Correlation Plot")
+
+```
+^[The correlation plot was produced with the ggcorr() function from package 'GGally' [@GGally].]
+
+
+#### Attribute Construction from Year Features 
+
+The barplot of Year Built shows a clear distinction between the number of houses built and sold in the 2000s vs the number built and sold in before that time. The distribution is left skewed, as we can see that the mean of the distribution is less than the median. Since there are so many years, it is better to crate a small subset of categories by making a new feature for the age of the house based on when it was built, and for this project the difference will be calculated from the last year in the dataset, which is 2010
+
+```{r, YearBuilt}
+ggplot(data_2_train, aes(YearBuilt))+
+  geom_bar(fill="#053061", color="#F5F5F5")+
+        geom_vline(aes(xintercept = mean(YearBuilt), 
+                   color = "mean"), linetype = "dashed", size = .7) +
+        geom_vline(aes(xintercept = median(YearBuilt), 
+                   color = "median"), linetype = "dashed", size = .7) +
+        scale_color_manual(name = "Statistics", values = c(mean = "red", median = "darkgreen")) +
+        ggtitle("Bar Plot of Year Built") +
+        xlab("Year Built") + ylab("Number of Homes")
+
+ggplot(data_2_train, aes(YrSold))+
+  geom_bar(fill="#053061", color="#F5F5F5")+
+        scale_color_manual(name = "Statistics", values = c(mean = "red", median = "darkgreen")) +
+        ggtitle("Year Sold") +
+        xlab("Year Sold") + ylab("Number of Homes")
+
+
+
+```
+^[The bar-plot was produced with ggplot() function from package 'ggplot2' [@ggplot2].]
+
+
+Curiously, in the scatter plot shown in Figure 10., where the dots have been colored in light blue by the YearRemodAdd feature,  newer houses are displaying as having been remodeled, apparently if the house has not been remodeled the year remodeled defaults to the year built. To improve the value of this metric we can create a new binary feature for Remodeled: Yes or No. Also, it might be useful to create a feature to show how recently the house was remodeled, and bin these into categories from most recently remodeled. 
+
+```{r, YearRemodeled}
+
+ggplot(data_2_train)+aes(YearRemodAdd)+ labs(title= "Year Remodeled Add", subtitle="Training Data")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) 
+
+ggplot(data_2_train, aes(x=YearBuilt, y=SalePrice, color=(YearBuilt))) + geom_jitter(height = 1) + labs(title="Year Built vs Sale Price", subtitle="Training Data")
+
+ggplot(data_2_train, aes(x=YearRemodAdd, y=SalePrice,color=(YearRemodAdd))) + geom_jitter(height = 1) + labs(title=" Year Remodeled vs Sale Price", subtitle="Training Data")
+
+ggplot(data_2_train, aes(x=YearBuilt, y=SalePrice, color=(YearRemodAdd))) + geom_jitter(height = 1) + labs(title="Year Built vs Sale Price Colored by Year Remodeled ", subtitle="Training Data")
+
+
+
+```
+
+^[The scatter plot was produced with ggplot() function from package 'ggplot2' [@ggplot2].]
+
+
+In order to make the year features more meaningful, we created new attributes as indicated in Table 8. In addition to the building age and  time since remodeled features, we added a feature to indicate if the home is a new build, since it is likely that being a new home will have an impact on the sale's price. We also added a feature for the year the house was sold, since macro economic events, like the economic depression in 2008, could also impact the sale price. Later, we simplify some of these newly created features by binning them into categories with fewer levels. Since all of the categorical features will have to be converted into numeric via dummy coding for modeling, having fewer levels will help with model performance and dimensionality reduction.
+
+
+\begin{table}[h]
+  \begin{center}
+  \begin{tabular}{ |c|c|c| } 
+    \hline
+    \multicolumn{2}{|c|}{Attribute Construction from Year Features} \\
+    \hline
+    New Feature & Method \\
+    \hline\hline
+    BldgAge  &  2010 $-$ YearBuilt \\
+    NewBuild & If YearBuilt or YearBuilt $+$ 1 $=$  YrSold then NewBuild =1  \\
+    Remod & If YearBuilt $=$ YearRemodAdd then Remod=0 \\ 
+    TimeSinceRemod & 2010 $-$ YearRemodAdd  \\
+    LastSold & 2010 $-$ YrSold \\
+    \hline
+  \end{tabular}
+  \end{center}
+\caption{Year Features}
+\end{table}
+
+
+```{r, NewYearFeatures }
+#Year Features   *********************************************
+
+#Remodeled
+data_2['Remod'] <- ifelse(data_2$YearBuilt==data_2$YearRemodAdd, 0, 1) #0=No Remodeling, 1=Remodeling
+
+#New Build 
+data_2['NewBuild'] <-  ifelse(data_2$YearBuilt == data_2$YrSold|data_2$YearBuilt+1 == data_2$YrSold, 1,0) 
+
+
+# Age of property based on last year of dataset
+
+data_2['BldgAge']<- max(data_2$YearBuilt) - data_2$YearBuilt
+
+head(data_2[,c("YearBuilt","BldgAge")])
+
+#cor(data_2$YearBuilt[1:1460],train1$SalePrice)
+#cor(data_2$Age[1:1460],train1$SalePrice)
+
+print(head(data_2[,c("YearBuilt","YrSold", "BldgAge","YearRemodAdd", "Remod", "NewBuild")]))
+
+```
+#### Reducing Levels by Grouping Unrepresented Categories
+
+Another way that we can improve the data for mining is to reduce the levels in categorical variables by merging under-represented categories. For example, in the case of the fireplaces, we can see that there are only a few houses that have 3 fireplaces, and the scatter plot shows that the relationship between three fireplaces and price is not much different than between two fireplaces and price, so we can merge these into one level. 
+
+Similarly, the scatter plot in Figure 13. of the "GarageCars" variable shows that few houses have more than three garages, so we could simplify the levels in this feature by keeping only three levels: 1,2, and 3+. 
+
+
+```{r, GarageFeature}
+
+
+fireplaces_bar<-ggplot(data_2_train)+aes(Fireplaces)+ labs(title="Fireplaces vs Sale Price", subtitle="Training Data")+
+geom_bar(fill="#92C5DE", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) 
+
+fireplaces_scatter<-ggplot(data_2_train, aes(x=Fireplaces, y=SalePrice, color=(Fireplaces))) + geom_jitter(height = 1) + labs(title="Fireplaces vs Sale Price", subtitle="Training Data")
+
+ garagecars_bar<-ggplot(data_2_train)+aes(GarageCars)+ labs(title="Garage vs Sale Price", subtitle="Training Data")+
+geom_bar(fill="#92C5DE", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) 
+
+garagecars_scatter<-ggplot(data_2_train, aes(x=GarageCars, y=SalePrice, color=(GarageCars))) + geom_jitter(height = 1) + labs(title="Garage vs Sale Price", subtitle="Training Data")
+
+
+grid.arrange(fireplaces_bar,fireplaces_scatter, garagecars_bar, garagecars_scatter,
+             ncol = 2, nrow = 2)
+
+
+```
+^[The plots were produced with ggplot() function from package 'ggplot2' [@ggplot2].]
+
+We applied this treatment to the features listed in Table 9. This will make these features more robust for modeling. 
+\begin{table}
+  \begin{center}
+  \begin{tabular}{ |c|c|c| } 
+  \hline
+  \multicolumn{2}{|c|}{Reducing Levels by Grouping} \\
+  \hline
+  New Feature & Method \\
+  \hline\hline
+  GarageCars & Merge 4 and 3 \\
+  Fireplaces & Merge 3 and  2 \\ 
+  Electrical &  Merge FuseF and FuseA\\
+  Function & Merge Maj1 and Mod, Min1 and Min2 \\
+  \hline
+  \end{tabular}
+  \end{center}
+\caption{Grouping}
+\end{table}
+
+
+
+
+```{r, Groupping}
+##****************************************************************************
+#Recode sparcely populated categories to reduce the number of levels 
+
+#Garage Cars
+data_2$GarageCars[data_2$GarageCars==4]<-3
+data_2$GarageCars[data_2$GarageCars==5]<-3
+
+ggplot(data_2[1:1460,])+aes(GarageCars)+ labs(title="GarageCars", subtitle="Training Data")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) 
+
+
+ggplot(data_2[1:1460,], aes(x=GarageCars, y=SalePrice, color=(GarageCars))) + geom_jitter(height = 1) + labs(title="GarageCars vs Sale Price", subtitle="Training Data")
+
+
+#FirePlaces 
+data_2$Fireplaces[data_2$Fireplaces==3]<-2
+data_2$Fireplaces[data_2$Fireplaces==4]<-2
+
+
+ggplot(data_2[1:1460,])+aes(Fireplaces)+ labs(title="Number of Fireplaces", subtitle="Training Data")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) 
+
+
+ggplot(data_2[1:1460,], aes(x=Fireplaces, y=SalePrice, color=(Fireplaces))) + geom_jitter(height = 1) + labs(title="Fireplaces vs Sale Price", subtitle="Training Data")
+
+#Electrical 
+#data_full$Electrical<-factor(data_full$Electrical, levels=c("Mix","FuseP","FuseF","FuseA","SBrkr"), ordered=TRUE)
+#data_2$Electrical
+data_2$Electrical<-recode_factor(data_2$Electrical, "Mix"=1, "FuseP"=2, "FuseF"=3, "FuseA"=3, "SBrkr"=4)
+#str(data_2$Electrical)
+#sum(is.na(data_2$Electrical))
+
+ggplot(data_2[1:1460,], aes(x=Electrical, y=SalePrice, color=(Electrical))) + geom_jitter(height = 1) + labs(title="Electrical vs Sale Price", subtitle="Training Data")
+
+ 
+#Function      
+data_2$Functional<-recode_factor(data_2$Functional,  "Sal"=1 , "Sev"=1 , "Maj2"=2 ,"Maj1"=3 ,"Mod"=3,  "Min2"=4 ,"Min1"=4 ,"Typ"=5)
+sum(is.na(levels(data_2$Functional)))
+
+
+ggplot(data_2[1:1460,], aes(x=Functional, y=SalePrice, color=(Functional))) + geom_jitter(height = 1) + labs(title="Functional vs Sale Price", subtitle="Training Data")
+
+
+
+
+```
+
+#### Attribute Construction by combining some features to make new features. 
+
+There are four different columns related to the number of bathrooms in different areas of the home.  Individually these features may not carry as mush weight as combined into a single feature for total number baths. 
+Some homes are showing as having zero baths, this might be a mistake, so it will be usefull to look closer are these examples. The nine rows which had zero full bath, did have other bathrooms in either the basement, or half bath, it is ok to leave them for now, since it will be better to combine all baths together and have one feature for the total baths. 
+
+
+```{r, BathroomFeatures}
+
+bsmtFB<-ggplot(data_2_train)+aes(BsmtFullBath)+ labs(title="Basement Full Bath", subtitle="Training Data")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) 
+
+
+BsmtHB<-ggplot(data_2_train)+aes(BsmtHalfBath)+ labs(title="Basement Half Bath", subtitle="Training Data")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) 
+
+hFB<-ggplot(data_2_train)+aes(FullBath)+ labs(title="Number of Full Baths in the Home", subtitle="Training Data")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) 
+
+
+#**************************************************Close look at fullbath = 0
+
+missing_bath <- filter(data_2_train, FullBath ==0)
+bath_features <- names(data_2_train)[sapply(names(data_full), function(x) str_detect(x, "Bath"))]
+
+data_2_train[c(54, 189, 376, 598, 635, 917, 1164,1214, 1271), c("BsmtFullBath","BsmtHalfBath","FullBath","HalfBath")]
+
+#****************************************************
+
+hhB<-ggplot(data_2_train)+aes(HalfBath)+ labs(title="Number of Half Baths in the Home", subtitle="Training Data")+
+geom_bar(fill="#053061", color="#F5F5F5")+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) 
+
+
+
+grid.arrange(bsmtFB, BsmtHB, hFB, hhB, 
+             ncol = 2, nrow = 2)
+
+
+```
+
+^[The plots were produced with ggplot() function from package 'ggplot2' [@ggplot2].]
+
+We did the same to the basement finished squared feet and the porch features. Furthermore, we created a new feature for total area by adding the living area square feet and the total basement square feet.  The goal here is to create new features that might have a stronger predictive power than the individual original features. Prior to modeling, we will be removing all of the features rendered redundant by the feature creation process. Table 10. summarizes the features we constructed by adding the same type of feature together to form a total.
+
+\begin{table}[h]
+  \begin{center}
+  \begin{tabular}{|c|c||c|} 
+  \hline
+  \multicolumn{2}{|c|}{New Feature Construction by Combining Existing Features} \\
+  \hline
+  New Feature & Method \\
+  \hline\hline
+  BSmtFinSFComb & Adding BsmtFinSF1 $+$ BsmtFinSF2 finished floors \\
+  TotalArea  & Adding GrLivArea $+$ TotalBsmtSF \\
+  TotalBaths & FullBath $+$ HalfBath $+$ BsmtFullBath $+$ BsmtHalfBath \\
+  TotalPorchSF & Adding OpenPorchSF $+$ EnclosedPorch $+$ X3SsnPorch $+$ ScreenPorch \\ 
+  \hline
+  \end{tabular}
+  \end{center}
+\caption{Combining}
+\end{table}
+
+
+```{r, CombineFeatures}
+data_2 <- mutate(data_2, BSmtFinSFComb = BsmtFinSF1 + BsmtFinSF2,
+                   TotalArea= GrLivArea + TotalBsmtSF,
+                   TotalBaths = BsmtFullBath + (0.5*BsmtHalfBath) + FullBath+ (0.5*HalfBath),
+                   PorchSF = OpenPorchSF + EnclosedPorch + X3SsnPorch + ScreenPorch)
+
+data_2[,c("X1stFlrSF","X2ndFlrSF", "BSmtFinSFComb", "TotalBsmtSF", "GrLivArea", "TotalArea")]
+
+
+
+```
+
+#### Attribute Construction by Binning
+Some of the categorical variables have a large number of levels. For example, "Neighborhood",  one of the features most highly correlated with sale price, has 25 different levels. 
+
+```{r, Neighborhood_plots}
+
+ggplot(data_2_train)+ 
+  geom_boxplot(mapping=aes(x=reorder(Neighborhood,SalePrice, FUN=median), y=SalePrice), fill = "#053061", color="#053061", alpha=.3,)+ggtitle("Neighborhood vs Sale Price")+theme(axis.text.x = element_text(angle = 45,hjust = 1), # use inclined text on the x-axis
+              plot.title = element_text(hjust = 0.5, vjust = 3, size = 14, face = "bold"), 
+              plot.subtitle = element_text(hjust = 0.5, vjust = 3, size = 12, face = "italic"))
+neig_tabl<-table(data_2$Neighborhood)
+kable(sort(neig_tabl,decreasing=T))
+
+```
+
+##### Data Transformation: Descretization and Binning-Neighboorhood
+Concept hirearchy discretization and binning as as a mean to reduce the the number of distinc values per attribute.  
+Nighborhood Feature: This categorical feature contains too many levels, so we will group some neighborhoods together, and create fewer categories. 
+
+Most expensive neighborhoods: ‘StoneBr’, ‘NridgHt’ and ‘NoRidge’.
+
+Least expensive neighborhoods: ‘MeadowV’, ‘BrDale’, and ‘IDOTRR’.
+
+Most heterogeneous neighborhoods: ‘StoneBr’, ‘Timber’ and ‘NridgeHt’.
+
+```{r, Nighborhood Grouping}
+#****************************************************************************
+# Neighborhoods by Overal Quality 
+
+# Create a data set grouping by Neighborhood and creating summary statistics
+
+ames_train<-as.data.frame(data_2[1:1460,])
+log_price<-log(ames_train$SalePrice)
+neigh_brk<-setDT(ames_train)[ , list(mean_1 = mean(SalePrice), median_1=median(SalePrice), st_dev = sd(SalePrice),  sum_gr = sum(SalePrice), range=range(SalePrice)[2] - range(SalePrice)[1]) , by = .(Neighborhood)]
+     
+# Sort by median and show top
+top_10<-kable(neigh_brk %>%
+        arrange(desc(median_1)) %>%
+        head(10))
+cat("\n")
+cat("Top 10 Neighborhoods by Median Sales Price:")
+top_10
+cat("\n")
+
+
+           
+
+bottom_10<-kable(neigh_brk %>%
+        arrange(desc(median_1)) %>%
+        tail(10))
+
+cat("\n")
+cat("Bottom 10 Neighborhoods by Median Sales Price:")
+bottom_10
+cat("\n")
+
+
+#neigh_brk %>%
+        #arrange(desc(st_dev)) %>%
+        #tail(6)
+
+
+cat("\n")
+cat("All Neighborhoods by Median Sales Price:")
+cat("\n")
+
+neigh_brk %>%
+        arrange(desc(median_1))
+
+
+#_______________________________________Look at variability
+#install.packages("ggridges")
+library(ggridges)
+data_2[1:1460,] %>%
+        ggplot(aes(x = SalePrice, y = Neighborhood, fill = Neighborhood)) +
+        geom_density_ridges() +
+        theme_ridges() +
+        theme(legend.position = "none") +
+        xlab("Sale Price") +
+        theme(axis.title.y = element_blank())
+
+#_____________________________________
+data_2$Neigh_Cat<-recode_factor(data_2$Neighborhood, 'MeadowV' = 1, 'IDOTRR' = 1, 'BrDale' = 1, 'BrkSide' = 2, 'Edwards' = 2,'OldTown' = 2,'Sawyer' = 2, 'Blueste' = 2, 'SWISU' = 2,  'NPkVill' = 2, 'NAmes' = 2, 'Mitchel' = 2,'SawyerW' = 3,'NWAmes' = 3,  'Gilbert' = 3, 'Blmngtn' = 3, 'CollgCr' = 3, 'Crawfor' = 4, 'ClearCr' = 4,'Somerst' = 4, 'Veenker' = 4, 'Timber' = 4, 'StoneBr' = 5, 'NoRidge' = 5, 'NridgHt' = 5)
+
+data_2$Neigh_Cat <- as.numeric(data_2$Neigh_Cat)
+#data_2[, c('Neigh_Cat', 'Neighborhood')]
+
+#plot quality vs neighborhood 
+ggplot(data_2[1:1460,], aes(x=Neigh_Cat, y=OverallQual, color=(Neigh_Cat))) + geom_point(alpha=0.2) + geom_jitter(height = 1.5) + labs(title="Quality and Neighborhood Category") +theme(axis.text.x = element_text(angle = 45,hjust = 1))
+
+ggplot(data_2, aes(x=Neigh_Cat, y=OverallQual, color=(Neighborhood))) + geom_point() + geom_jitter(height = 1.5) + labs(title="Quality and Neighborhood Category") +theme(axis.text.x = element_text(angle = 45,hjust = 1))
+
+
+ggplot(data_2[1:1460,], aes(x=Neigh_Cat, y=SalePrice, color=(Neighborhood))) + geom_point(alpha=0.2) + geom_jitter(height = 1.5) + labs(title="Quality and Neighborhood Category") +theme(axis.text.x = element_text(angle = 45,hjust = 1))
+
+
+ggplot(data_2[1:1460,], aes(x=Neigh_Cat, fill=factor(Neigh_Cat))) + geom_bar() + scale_fill_brewer(palette = "Blues") + labs(title= "New Neighborhood Category") +theme(axis.text.x = element_text(angle = 45,hjust = 1) )
+
+
+
+
+```
+^[The plots were produced with ggplot() function from package 'ggplot2' [@ggplot2].]
+
+In addition to the "Neighborhood" feature, we also used binning as a means to reduce the number of unique levels for the "Month" feature.  For the Month feature, we ploted the months, and put them into bins according to low, medium, or high season, based on the number of houses sold. The AgeCat and RemodelFromCat are new features based of other features we contructed previously from the year features. These features contain fewer levels, which is one of our goals here, to reduce the nuber of levels in categorical features, so that the prediction model is simpler, which as mentioned before reduces the error.  Table 11. shows the attributes constructed by binning.
+
+\begin{table}
+  \begin{center}
+  \begin{tabular}{ |c|c|c| } 
+  \hline
+  \multicolumn{2}{|c|}{Attribute Construction by Binning} \\
+  \hline
+  New Feature & Method \\
+  \hline\hline
+  AgeCat & BldgAge into 4 age categories: Antique, Old, Mid, New \\
+  RemodelFromCat & Max year in Data (2010) $-$ YearRemodAdd into 4 categories \\ 
+  SeasonSale &  MoSold into 3 categories for Low, Mid and High season\\
+  NeighCat & Neighborhood into 5 categories based on OveralQuality \\
+  \hline
+  \end{tabular}
+  \end{center}
+\caption{Binning}
+\end{table}
+
+
+
+```{r, Binning}
+#Classified the age of the house into 4 categories 
+
+min(data_2$BldgAge) #minumum age of house  in dataset 0
+max(data_2$BldgAge) #maximum age of house in dataset 138
+
+
+data_2[,c("BldgAge","YearBuilt")]
+
+age<-data_2$BldgAge
+AgeCat<- case_when(age<= 9 ~ 'New',
+                  between(age, 10, 40) ~ 'Mid',
+                  between(age, 41, 70) ~ 'Old',
+                  age >= 71 ~ 'Antique')
+
+data_2$AgeCat<-as.numeric(factor(AgeCat, levels=c('Antique','Old', 'Mid', 'New'), ordered=TRUE))
+
+
+head(data_2[,c("BldgAge", "AgeCat","YearBuilt")])
+
+#Time when property sold  based on max year of dataset
+
+data_2$LastSold <- 2010 - data_2$YrSold  #This might be interesting to look at from economic boom and bust effects
+
+#****************************************************************************
+
+##Years Since Remodeled 
+data_2['YearRemodAdd2'] <- ifelse(data_2$YearBuilt == data_2$YearRemodAdd, 0, data_2$YearRemodAdd) #fix the year remodeled column
+
+data_2[,c("YearBuilt","YearRemodAdd", 'YearRemodAdd2','Remod' )]
+
+data_2['TimeSinceRemod'] <- ifelse(data_2$Remod == 1, 2010 - data_2$YearRemodAdd2,0) 
+
+
+data_2$RemodelFromCat<- case_when(data_2$TimeSinceRemod <= 0 & data_2$NewBuild == 1 ~ 'New',
+                  data_2$TimeSinceRemod <= 0 & data_2$YearRemodAdd2 == 0 ~ 'None',
+                  between(data_2$TimeSinceRemod, 0, 5) ~ 'Recent',
+                  between(data_2$TimeSinceRemod, 6, 10) ~ 'Mid',
+                  between(data_2$TimeSinceRemod, 11, 20) ~ 'Old',
+                  data_2$TimeSinceRemod >= 20 ~ 'Outdated')
+
+
+
+data_2$RemodelFromCat<-factor(data_2$RemodelFromCat, levels=c('None','Outdated','Old', 'Mid','Recent', 'New'), ordered=TRUE)
+
+ggplot(data_2, aes(x=RemodelFromCat)) +
+  geom_bar(fill = 'blue') +
+  geom_text(aes(label=..count..), stat='count', vjust = -.5) +
+  theme_minimal() 
+
+data_2$RemodelFromCat<-as.integer(data_2$RemodelFromCat)
+
+
+data_2[,c("YrSold","YearBuilt","YearRemodAdd", "YearRemodAdd2","Remod", 'TimeSinceRemod', 'BldgAge', 'NewBuild')]
+
+
+#****************************************************************************
+
+# Sales by season
+
+ggplot(data_2, aes(x=MoSold)) +
+  geom_bar(fill = 'gray') +
+  geom_text(aes(label=..count..), stat='count', vjust = -.5) +
+  theme_minimal() 
+
+
+data_2$SeasonSale <- mapvalues(data_2$MoSold, from = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"), to = c("LowSeason", "LowSeason", "MidSeason",'MidSeason', 'HighSeason','HighSeason','HighSeason','MidSeason', 'MidSeason','MidSeason','LowSeason','LowSeason'))
+
+data_2[,c("MoSold","SeasonSale")]
+
+data_2$SeasonSale<-as.numeric(factor(data_2$SeasonSale,levels=c('LowSeason','MidSeason', 'HighSeason'),ordered=TRUE))
+#data_2[,c("MoSold","SeasonSale")]
+
+```
+
+
+```{r, Convert all categorical to numeric }
+#********************** Update Categorical Features to have numerical value
+
+data_2$Utilities <-as.numeric(data_2$Utilities)
+data_2$LandSlope<-as.numeric(data_2$LandSlope)
+data_2$ExterQual <-as.numeric(data_2$ExterQual)
+data_2$ExterCond <-as.numeric(data_2$ExterCond)
+data_2$BsmtQual <-as.numeric(data_2$BsmtQual)
+data_2$BsmtCond <-as.numeric(data_2$BsmtCond)
+data_2$BsmtExposure <-as.numeric(data_2$BsmtExposure)
+data_2$BsmtFinType1 <-as.numeric(data_2$BsmtFinType1)
+data_2$BsmtFinType2 <-as.numeric(data_2$BsmtFinType2)
+data_2$HeatingQC <-as.numeric(data_2$HeatingQC)
+data_2$CentralAir <-as.numeric(data_2$CentralAir)
+data_2$Electrical <-as.numeric(data_2$Electrical)
+data_2$KitchenQual <-as.numeric(data_2$KitchenQual)
+data_2$Functional <-as.numeric(data_2$Functional)
+data_2$FireplaceQu <-as.numeric(data_2$FireplaceQu)
+data_2$GarageFinish <-as.numeric(data_2$GarageFinish)
+data_2$GarageQual <-as.numeric(data_2$GarageQual)
+data_2$GarageCond <-as.numeric(data_2$GarageCond)
+data_2$PavedDrive <-as.numeric(data_2$PavedDrive)
+data_2$PoolQC <-as.numeric(data_2$PoolQC)
+data_2$Fence <-as.numeric(data_2$Fence)
+data_2$OverallQual<-as.numeric(data_2$OverallQual)
+data_2$OverallCond <-as.numeric(data_2$OverallCond)
+
+
+
+
+```
+
+
+#### New Variables by Interactions
+The last type of feature engineering we attempted is attribute construction from interactions by multiplying certain features listed in Table 11. 
+
+\begin{table} [h]
+  \begin{center}
+  \begin{tabular}{ |c|c|c| } 
+  \hline
+  \multicolumn{2}{|c|}{New Variables from Interactions} \\
+  \hline
+  New Feature & Method \\
+  \hline\hline
+  OverallScore & Multiplying GarageQual $*$ GarageCond \\
+  GarageScore & Multiplying OverallQual $*$ OverallCond \\
+  ExterScore & Multiplying ExterQual $*$ ExterCond \\ 
+  KitchenScore & Multiplying KitchenAbvGr $*$ KitchenQual\\
+  GarageGrade & Multiplying GarageArea $*$ GarageQual\\
+  \hline
+  \end{tabular}
+  \end{center}
+\caption{Interactions}
+\end{table}
+
+
+
+```{r, New Features from Interactions }
+#Interactions
+# Create a "OverallScore" feature by multiplying overall Quality & Condition
+# Create a "GarageScore" feature by multiplying Garage Quality & Condition
+# Create a "ExterScore" feature by multiplying Exterior Quality & Condition
+# Create a "KitchenScore" feature by multiplying kitchen above ground area & Quality
+# Create a "GarageAreaScore" feature by multiplying multiple garage area & Quality
+
+
+data_2 <- mutate(data_2,GarageScore = GarageQual * GarageCond,
+                   OverallScore= OverallQual * OverallCond,
+                   ExterScore = ExterQual * ExterCond,
+                   KitchenScore = KitchenAbvGr * KitchenQual,
+                   GarageGrade = GarageArea * GarageQual)
+
+```
+### 2.4. Dimensio  nality Reduction
+The last major step left in pre-processing is dimensionality and numerosity reduction through the following steps:
+
+* Delete Redundant Features Due to Data Engineering
+* Delete Outliers
+* Delete Features with Near Zero Variability
+```{r}
+data_2 <- subset(data_2, select = -c(BsmtFinSF1,BsmtFinSF2,BsmtFullBath,GarageArea,GarageQual,
+                                         BsmtHalfBath,FullBath,HalfBath,X1stFlrSF, X2ndFlrSF,
+                                         OpenPorchSF,EnclosedPorch,X3SsnPorch,ScreenPorch,
+                                         GarageQual,GarageCond,ExterCond,KitchenAbvGr,KitchenQual,
+                                         BsmtFinType1,BsmtFinType2,BsmtCond,BsmtQual,
+                                         Neighborhood,YearBuilt,YrSold, BldgAge,YearRemodAdd, MoSold, GarageYrBlt,YearRemodAdd2, Remod, TimeSinceRemod,PoolQC))
+
+
+
+```
+
+
+#### Outliers 
+Accordying to the data collector: 
+“There are 5 observations that an instructor may wish to remove from the data set before giving it to students. Three of them are true outliers (Partial Sales that likely don’t represent actual market values) and two of them are simply unusual sales (very large houses priced relatively appropriately). I would recommend removing any houses with more than 4000 square feet from the data set (which eliminates these 5 unusual observations)”
+
+As we can see from the scatterplot 4 of the outlier are in the training set, which means that one is in the test set, because we are using the test set to submit to Kaggle.com for evalueation, we can not remove any rows from the test set (or it would be incomplete). Here, we will only remove the outliers indicated by the data collector in the training set only. Additional outlier detection could be useful in the feature. 
+```{r, Outliers}
+
+highlight_df <- data_2_train %>% 
+             filter(GrLivArea>=4000)
+
+outlier_plot2<-ggplot(data_2_train, aes(x =GrLivArea , y = SalePrice, color="red")) + ggtitle("Outliers: Living Area vs SalesPrice")+
+geom_point(color="#053061", alpha=.5)+ 
+geom_point(data=highlight_df,
+             aes(x=GrLivArea,y=SalePrice, color="red"))+
+  theme(
+  panel.border = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.line = element_line(colour = "#053061"))+ scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) 
+outlier_plot2$labels$colour <- "Outliers"
+outlier_plot2
+
+
+```
+
+```{r}
+highlight_df
+data_2 <- data_2[-c(524, 692, 1183, 1299),] #For now, deleting only the outliers in the gtraining set. 
+
+```
+
+
+```{r, }
+length(data_2)   #Columns after feature engineering 67              
+sapply(data_2 , class)
+names(data_2) 
+str(data_2)
+###### Export Pre-processed data
+
+#write.csv(data_2,"AmesDataCleanP1.csv", row.names = FALSE)
+
+```
+#### Delete features with near zero variability 
+
+Near-zero variance variables are the features that only contain a few unique values, and provide little useful information to a model. Although, some algorithms are unaffected by zero or near zero variance features, they can make a model harder to interpret and also may take longer to compute. We will carry out this step with the pre_process() function from the 'caret' package [@caret]. Also, in the same step we will normalize, and center all numeric features using the same pre_process function. 
+
+The new data-set, after cleaning NA values and extensive feature engineering, consists of 2915 rows and 67 columns. After variables with near zero variability are removed, 60 columns remain. 
+
+
+
+```{r preprocess, include=FALSE,}
+#### Use pre-process to finish the preprocessing steps
+
+# identify only the predictor variables
+features <- setdiff(names(data_2), c("SalePrice", "Id"))
+train_final<-data_2[1:1456,]
+test_final<-data_2[1457:2915,]
+
+Test_ID<-test_final$Id
+# pre-process estimation based on training features
+pre_process <- preProcess(
+  x      = train_final[features],  
+  method = c("BoxCox", "center", "scale", "nzv"))
+
+# apply to both training & test 
+train_x<- predict(pre_process, train_final[, features]) #1460 rows and 59 columns
+test_x<- predict(pre_process, test_final[, features]) # 1,459 rows and 59 columns
+
+train_1<-train_x
+train_1$SalePrice<-log(train_final$SalePrice) #Log transform saleprice 
+
+str(train_1)
+
+```
+
+The last step is to convert categorical features to numeric with dummy codding using function dummyVars() from Caret package[@caret]. After converting categorical features to numeric with dummy coding we end up with 158 columns.
+
+
+```{r dummycode1,include=FALSE}
+
+factor_var <- which(lapply(train_1, class) == "factor")
+data_temp<-train_1
+dummy<- dummyVars(" ~   MSZoning +Street + Alley+ LotShape + LandContour+ LotConfig + Condition1 + Condition2 + BldgType + HouseStyle + RoofStyle + RoofMatl+ Heating + Exterior1st + Exterior2nd + MasVnrType + Foundation + GarageType + SaleType + SaleCondition + MiscFeature" , data = data_temp, fullRank = TRUE)
+pred<- data.frame (predict(dummy, data_temp))
+train_1<-cbind(train_1[,-factor_var], pred)
+head(train_1) #158 Columns
+
+
+#Do the same on test set
+data_temp_test<-test_x
+pred_test<- data.frame (predict(dummy, data_temp_test))
+test_1<-cbind(test_x[,-factor_var], pred_test)
+head(test_1) #157 Columns
+
+
+```
+
+
+
+
+
+
