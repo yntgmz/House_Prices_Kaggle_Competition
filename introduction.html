@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>House Prices: Advanced Regression Techniques</title>
+  <meta name="description" content="House Prices: Advanced Regression Techniques" />
+  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="House Prices: Advanced Regression Techniques" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="https://github.com/yntgmz/House_Prices_Kaggle_Competition" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="House Prices: Advanced Regression Techniques" />
+  
+  
+  
+
+<meta name="author" content="Yanet Gomez" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+<link rel="next" href="data.html"/>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
+<link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#origin"><i class="fa fa-check"></i><b>1.1</b> Origin</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#starting-point"><i class="fa fa-check"></i><b>1.2</b> Starting Point</a></li>
+<li class="chapter" data-level="1.3" data-path="introduction.html"><a href="introduction.html#technical-skills"><i class="fa fa-check"></i><b>1.3</b> Technical Skills</a></li>
+<li class="chapter" data-level="1.4" data-path="introduction.html"><a href="introduction.html#problem-definition"><i class="fa fa-check"></i><b>1.4</b> Problem Definition</a></li>
+<li class="chapter" data-level="1.5" data-path="introduction.html"><a href="introduction.html#data-description"><i class="fa fa-check"></i><b>1.5</b> Data Description</a></li>
+<li class="chapter" data-level="1.6" data-path="introduction.html"><a href="introduction.html#data-analytics-workflow"><i class="fa fa-check"></i><b>1.6</b> Data Analytics Workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data.html"><a href="data.html"><i class="fa fa-check"></i><b>2</b> Data</a></li>
+<li class="chapter" data-level="3" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>3</b> Data Pre-processing</a><ul>
+<li class="chapter" data-level="3.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#identifying-and-correcting-missing-values"><i class="fa fa-check"></i><b>3.1</b> Identifying and Correcting Missing Values</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#detect-missing-values"><i class="fa fa-check"></i><b>3.1.1</b> Detect Missing Values</a></li>
+<li class="chapter" data-level="3.1.2" data-path="data-pre-processing.html"><a href="data-pre-processing.html#dealing-with-missing-values"><i class="fa fa-check"></i><b>3.1.2</b> Dealing With Missing Values</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="data-pre-processing.html"><a href="data-pre-processing.html#correct-data-types"><i class="fa fa-check"></i><b>3.2</b> Correct Data Types</a></li>
+<li class="chapter" data-level="3.3" data-path="data-pre-processing.html"><a href="data-pre-processing.html#feature-transformation"><i class="fa fa-check"></i><b>3.3</b> Feature Transformation</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#visualizing-the-distribution-and-spread-of-target-feature-salesprice"><i class="fa fa-check"></i><b>3.3.1</b> Visualizing the Distribution and Spread of Target Feature : SalesPrice</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="data-pre-processing.html"><a href="data-pre-processing.html#dimensionality-and-numerosity-reduction"><i class="fa fa-check"></i><b>3.4</b> Dimensionality and Numerosity Reduction</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#outliers"><i class="fa fa-check"></i><b>3.4.1</b> Outliers</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="modeling.html"><a href="modeling.html"><i class="fa fa-check"></i><b>4</b> Modeling</a><ul>
+<li class="chapter" data-level="4.1" data-path="modeling.html"><a href="modeling.html#multivariate-linear-regression-model"><i class="fa fa-check"></i><b>4.1</b> Multivariate Linear Regression Model</a></li>
+<li class="chapter" data-level="4.2" data-path="modeling.html"><a href="modeling.html#model-selection"><i class="fa fa-check"></i><b>4.2</b> Model Selection</a></li>
+<li class="chapter" data-level="4.3" data-path="modeling.html"><a href="modeling.html#regularized-regression-models"><i class="fa fa-check"></i><b>4.3</b> Regularized Regression Models</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="modeling.html"><a href="modeling.html#identify-the-optimal-lambda-parameter"><i class="fa fa-check"></i><b>4.3.1</b> Identify the Optimal Lambda Parameter</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="modeling.html"><a href="modeling.html#training-the-regularized-regression-models"><i class="fa fa-check"></i><b>4.4</b> Training the Regularized Regression Models</a></li>
+<li class="chapter" data-level="4.5" data-path="modeling.html"><a href="modeling.html#evaluating-the-regularized-regression-models-performance"><i class="fa fa-check"></i><b>4.5</b> Evaluating the Regularized Regression Models’ Performance</a></li>
+<li class="chapter" data-level="4.6" data-path="modeling.html"><a href="modeling.html#training-xgboost-model-with-feature-selection"><i class="fa fa-check"></i><b>4.6</b> Training XGBoost Model with Feature Selection</a><ul>
+<li class="chapter" data-level="4.6.1" data-path="modeling.html"><a href="modeling.html#training-the-xgboost-model"><i class="fa fa-check"></i><b>4.6.1</b> Training the XGboost Model</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="modeling.html"><a href="modeling.html#evaluating-xgboost-models-performance"><i class="fa fa-check"></i><b>4.7</b> Evaluating XGBoost Model’s Performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="prediction.html"><a href="prediction.html"><i class="fa fa-check"></i><b>5</b> Prediction</a><ul>
+<li class="chapter" data-level="5.1" data-path="prediction.html"><a href="prediction.html#prediction-with-regularized-regression-models"><i class="fa fa-check"></i><b>5.1</b> Prediction with Regularized Regression Models</a></li>
+<li class="chapter" data-level="5.2" data-path="prediction.html"><a href="prediction.html#prediction-with-xgboost-model"><i class="fa fa-check"></i><b>5.2</b> Prediction with XGboost Model</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="validation.html"><a href="validation.html"><i class="fa fa-check"></i><b>6</b> Validation</a><ul>
+<li class="chapter" data-level="6.0.1" data-path="validation.html"><a href="validation.html#kaggle-submission"><i class="fa fa-check"></i><b>6.0.1</b> Kaggle Submission</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a><ul>
+<li class="chapter" data-level="7.1" data-path="conclusion.html"><a href="conclusion.html#answer-to-research-questions"><i class="fa fa-check"></i><b>7.1</b> Answer to Research Questions</a></li>
+<li class="chapter" data-level="7.2" data-path="conclusion.html"><a href="conclusion.html#future-work"><i class="fa fa-check"></i><b>7.2</b> Future Work</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="bibliography.html"><a href="bibliography.html"><i class="fa fa-check"></i>Bibliography</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">House Prices: Advanced Regression Techniques</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">House Prices: Advanced Regression Techniques</h1>
+<p class="author"><em>Yanet Gomez</em></p>
+<p class="date"><em>2/19/2021</em></p>
+</div>
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<div id="origin" class="section level2">
+<h2><span class="header-section-number">1.1</span> Origin</h2>
+<ul>
+<li>Semester Date: Spring 2021</li>
+<li>Class: Capstone Portfolio (STAT 6382)</li>
+<li>Program: Master of Science in Data Analytics</li>
+<li>School: University of Houston Downtown</li>
+</ul>
+</div>
+<div id="starting-point" class="section level2">
+<h2><span class="header-section-number">1.2</span> Starting Point</h2>
+<p>House Prices: Advanced Regression Techniques is an ongoing Kaggle competition <span class="citation">(Kaggle, n.d.)</span>. This “getting started” competition calls for extensive data pre-processing, feature engineering, and implementation of advanced regression techniques like random forest and gradient boosting. The data-set was made available through the Kaggle website at kaggle.com <span class="citation">(De Cock 2011b)</span>.</p>
+</div>
+<div id="technical-skills" class="section level2">
+<h2><span class="header-section-number">1.3</span> Technical Skills</h2>
+<ul>
+<li><p>Techniques: Data Cleaning, Exploratory Data Analysis, Feature Engineering, Advanced Regression Techniques, Machine Learning</p></li>
+<li><p>Program: R</p></li>
+</ul>
+</div>
+<div id="problem-definition" class="section level2">
+<h2><span class="header-section-number">1.4</span> Problem Definition</h2>
+<p>Buying a house is a complicated decision making process for a lot of people. As Kaggle.com puts it: “Ask a home buyer to describe their dream house, and they probably won’t begin with the height of the basement ceiling or the proximity to an east-west railroad” <span class="citation">(Kaggle, n.d.)</span>. However, it is in fact, characteristics like these that influence the price of homes. Throughout this project we will explore a plethora of house features from kitchen quality to land slope, and evaluate their contribution to the sale price of homes. With some luck, or rather some data analytics skills, we will gain some insight into the real estate world of pricing residential homes. By understanding the relationship between key features and price, both buyers and sellers can optimize their price negotiations game, and make smarter financial decisions in the process of buying or selling a home.</p>
+<p>This project has three main goals. The first, as defined by Kaggle, is to predict the sales price value for each ID in the test set using advanced regression techniques. The second goal is to identify which features affect sale price the most. Lastly, I would like to explore which data analytics techniques lead to a better prediction in this case.</p>
+<ul>
+<li>Which are the most relevant features that impact sales price?</li>
+<li>Which data pre-processing techniques improve the predictive value of the data?</li>
+<li>Which model performs best at predicting price?</li>
+</ul>
+</div>
+<div id="data-description" class="section level2">
+<h2><span class="header-section-number">1.5</span> Data Description</h2>
+<p>The data is the “Ames Housing Dataset”, provided at kaggle.com, which contains information about the sale of individual residential properties in Ames, Iowa from 2006 to 2010. The original dataset was compiled by Dean DeCock for use in data science education, and and is available online here: <a href="http://www.amstat.org/publications/jse/v19n3/decock/AmesHousing.xls">Ames Housing Dataset</a>.</p>
+<p>The data set contains 2919 observations and 80 explanatory variables, plus the variable of interest: Sales Price. Kaggle provided the data split into train and test sets.</p>
+</div>
+<div id="data-analytics-workflow" class="section level2">
+<h2><span class="header-section-number">1.6</span> Data Analytics Workflow</h2>
+<p>Here is an overview of the data analytics workflow for this project done with packages ‘DiagrameR’ <span class="citation">(Iannone 2020)</span> and ‘webshot’ <span class="citation">(Chang 2019)</span>.</p>
+<div class="figure" style="text-align: center"><span id="fig:Workflow"></span>
+<div id="htmlwidget-6d0c1faa88f4ded8f355" style="width:auto;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6d0c1faa88f4ded8f355">{"x":{"diagram":"\ndigraph boxes_and_circles {\ngraph [layout = dot, rankdir = LR]\nnode [shape = rectangle,color=AliceBlue, fontname = Helvetica,\n     style = filled, fillcolor = AliceBlue, fontname=Helvetica, fontsize=14, fontcolor=SlateGray]\nedge [color = SteelBlue,\n     arrowsize = 1, penwidth=1.2]\nrec1 [label = \"Data Collection\"]\nrec2 [label = \"Data Cleaning\"]\nrec3 [label =  \"Data Transformation\"]\nrec4 [label = \"Modeling\"]\nrec5 [label = \"Prediction\"]\nrec6 [label = \"Submission\"]\n\n\nrec1-> rec2-> rec3-> rec4-> rec5-> rec6\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+Figure 1.1: Workflow
+</p>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+<a href="data.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+},
+"search": false
+});
+});
+</script>
+
+</body>
+
+</html>
