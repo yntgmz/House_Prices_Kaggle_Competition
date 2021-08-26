@@ -2,14 +2,9 @@
 title: "House Prices: Advanced Regression Techniques"
 author: "Yanet Gomez"
 date: "2/19/2021"
-github-repo: "https://github.com/yntgmz/House_Prices_Kaggle_Competition.git"
+github-repo: "https://86a7c-1cf78@github.com/yntgmz/House_Prices_Kaggle_Competition.git"
 output:
-  bookdown::gitbook:
-    sharing:
-      facebook: no
-      github: yes
-      twitter: no
-      linkedin: yes
+  output=github_document
 new_session: true
 bibliography: houseprices.bib
 
