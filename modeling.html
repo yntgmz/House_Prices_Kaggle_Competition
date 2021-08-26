@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>4 Modeling | House Prices: Advanced Regression Techniques</title>
+  <meta name="description" content="4 Modeling | House Prices: Advanced Regression Techniques" />
+  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="4 Modeling | House Prices: Advanced Regression Techniques" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="https://github.com/yntgmz/House_Prices_Kaggle_Competition" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="4 Modeling | House Prices: Advanced Regression Techniques" />
+  
+  
+  
+
+<meta name="author" content="Yanet Gomez" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="data-pre-processing.html"/>
+<link rel="next" href="prediction.html"/>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
+<link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#origin"><i class="fa fa-check"></i><b>1.1</b> Origin</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#starting-point"><i class="fa fa-check"></i><b>1.2</b> Starting Point</a></li>
+<li class="chapter" data-level="1.3" data-path="introduction.html"><a href="introduction.html#technical-skills"><i class="fa fa-check"></i><b>1.3</b> Technical Skills</a></li>
+<li class="chapter" data-level="1.4" data-path="introduction.html"><a href="introduction.html#problem-definition"><i class="fa fa-check"></i><b>1.4</b> Problem Definition</a></li>
+<li class="chapter" data-level="1.5" data-path="introduction.html"><a href="introduction.html#data-description"><i class="fa fa-check"></i><b>1.5</b> Data Description</a></li>
+<li class="chapter" data-level="1.6" data-path="introduction.html"><a href="introduction.html#data-analytics-workflow"><i class="fa fa-check"></i><b>1.6</b> Data Analytics Workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data.html"><a href="data.html"><i class="fa fa-check"></i><b>2</b> Data</a></li>
+<li class="chapter" data-level="3" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>3</b> Data Pre-processing</a><ul>
+<li class="chapter" data-level="3.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#identifying-and-correcting-missing-values"><i class="fa fa-check"></i><b>3.1</b> Identifying and Correcting Missing Values</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#detect-missing-values"><i class="fa fa-check"></i><b>3.1.1</b> Detect Missing Values</a></li>
+<li class="chapter" data-level="3.1.2" data-path="data-pre-processing.html"><a href="data-pre-processing.html#dealing-with-missing-values"><i class="fa fa-check"></i><b>3.1.2</b> Dealing With Missing Values</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="data-pre-processing.html"><a href="data-pre-processing.html#correct-data-types"><i class="fa fa-check"></i><b>3.2</b> Correct Data Types</a></li>
+<li class="chapter" data-level="3.3" data-path="data-pre-processing.html"><a href="data-pre-processing.html#feature-transformation"><i class="fa fa-check"></i><b>3.3</b> Feature Transformation</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#visualizing-the-distribution-and-spread-of-target-feature-salesprice"><i class="fa fa-check"></i><b>3.3.1</b> Visualizing the Distribution and Spread of Target Feature : SalesPrice</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="data-pre-processing.html"><a href="data-pre-processing.html#dimensionality-and-numerosity-reduction"><i class="fa fa-check"></i><b>3.4</b> Dimensionality and Numerosity Reduction</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#outliers"><i class="fa fa-check"></i><b>3.4.1</b> Outliers</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="modeling.html"><a href="modeling.html"><i class="fa fa-check"></i><b>4</b> Modeling</a><ul>
+<li class="chapter" data-level="4.1" data-path="modeling.html"><a href="modeling.html#multivariate-linear-regression-model"><i class="fa fa-check"></i><b>4.1</b> Multivariate Linear Regression Model</a></li>
+<li class="chapter" data-level="4.2" data-path="modeling.html"><a href="modeling.html#model-selection"><i class="fa fa-check"></i><b>4.2</b> Model Selection</a></li>
+<li class="chapter" data-level="4.3" data-path="modeling.html"><a href="modeling.html#regularized-regression-models"><i class="fa fa-check"></i><b>4.3</b> Regularized Regression Models</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="modeling.html"><a href="modeling.html#identify-the-optimal-lambda-parameter"><i class="fa fa-check"></i><b>4.3.1</b> Identify the Optimal Lambda Parameter</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="modeling.html"><a href="modeling.html#training-the-regularized-regression-models"><i class="fa fa-check"></i><b>4.4</b> Training the Regularized Regression Models</a></li>
+<li class="chapter" data-level="4.5" data-path="modeling.html"><a href="modeling.html#evaluating-the-regularized-regression-models-performance"><i class="fa fa-check"></i><b>4.5</b> Evaluating the Regularized Regression Models’ Performance</a></li>
+<li class="chapter" data-level="4.6" data-path="modeling.html"><a href="modeling.html#training-xgboost-model-with-feature-selection"><i class="fa fa-check"></i><b>4.6</b> Training XGBoost Model with Feature Selection</a><ul>
+<li class="chapter" data-level="4.6.1" data-path="modeling.html"><a href="modeling.html#training-the-xgboost-model"><i class="fa fa-check"></i><b>4.6.1</b> Training the XGboost Model</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="modeling.html"><a href="modeling.html#evaluating-xgboost-models-performance"><i class="fa fa-check"></i><b>4.7</b> Evaluating XGBoost Model’s Performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="prediction.html"><a href="prediction.html"><i class="fa fa-check"></i><b>5</b> Prediction</a><ul>
+<li class="chapter" data-level="5.1" data-path="prediction.html"><a href="prediction.html#prediction-with-regularized-regression-models"><i class="fa fa-check"></i><b>5.1</b> Prediction with Regularized Regression Models</a></li>
+<li class="chapter" data-level="5.2" data-path="prediction.html"><a href="prediction.html#prediction-with-xgboost-model"><i class="fa fa-check"></i><b>5.2</b> Prediction with XGboost Model</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="validation.html"><a href="validation.html"><i class="fa fa-check"></i><b>6</b> Validation</a><ul>
+<li class="chapter" data-level="6.0.1" data-path="validation.html"><a href="validation.html#kaggle-submission"><i class="fa fa-check"></i><b>6.0.1</b> Kaggle Submission</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a><ul>
+<li class="chapter" data-level="7.1" data-path="conclusion.html"><a href="conclusion.html#answer-to-research-questions"><i class="fa fa-check"></i><b>7.1</b> Answer to Research Questions</a></li>
+<li class="chapter" data-level="7.2" data-path="conclusion.html"><a href="conclusion.html#future-work"><i class="fa fa-check"></i><b>7.2</b> Future Work</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="bibliography.html"><a href="bibliography.html"><i class="fa fa-check"></i>Bibliography</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">House Prices: Advanced Regression Techniques</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="modeling" class="section level1">
+<h1><span class="header-section-number">4</span> Modeling</h1>
+<p><strong>Dummy Codding: One of the last pre-processing steps before modeling</strong></p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1"><span class="co">#Convert Categorical Features to numeric with dummy codding using function dummyVars() from Caret package.</span></a>
+<a class="sourceLine" id="cb75-2" data-line-number="2">factor_var &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">lapply</span>(ames_clean, class) <span class="op">==</span><span class="st"> &quot;factor&quot;</span>)</a>
+<a class="sourceLine" id="cb75-3" data-line-number="3">data_temp&lt;-ames_clean</a>
+<a class="sourceLine" id="cb75-4" data-line-number="4">dummy&lt;-<span class="st"> </span><span class="kw">dummyVars</span>(<span class="st">&quot; ~ MSSubClass + MSZoning +Street + Alley+ LotShape + LandContour+ LotConfig + Condition1 + Condition2 + BldgType + HouseStyle + RoofStyle + RoofMatl+ Heating + Exterior1st + Exterior2nd + MasVnrType + Foundation + GarageType + SaleType + SaleCondition + MiscFeature&quot;</span> , <span class="dt">data =</span> data_temp, <span class="dt">fullRank =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb75-5" data-line-number="5">pred&lt;-<span class="st"> </span><span class="kw">data.frame</span> (<span class="kw">predict</span>(dummy, data_temp))</a>
+<a class="sourceLine" id="cb75-6" data-line-number="6">data_final&lt;-<span class="kw">cbind</span>(ames_clean[,<span class="op">-</span>factor_var], pred)</a></code></pre></div>
+<p><strong>Split pre-processed dataset into Train and Test sets for modeling</strong>*</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" data-line-number="1">train_<span class="dv">1</span>&lt;-data_final[<span class="dv">1</span><span class="op">:</span><span class="dv">1456</span>,<span class="op">-</span><span class="dv">1</span>] </a>
+<a class="sourceLine" id="cb76-2" data-line-number="2">train_x&lt;-<span class="kw">select</span>(train_<span class="dv">1</span>, <span class="op">-</span>SalePrice)</a>
+<a class="sourceLine" id="cb76-3" data-line-number="3">train_y&lt;-train_<span class="dv">1</span><span class="op">$</span>SalePrice</a>
+<a class="sourceLine" id="cb76-4" data-line-number="4">test_<span class="dv">1</span>&lt;-data_final[<span class="dv">1457</span><span class="op">:</span><span class="dv">2915</span>,<span class="op">-</span><span class="dv">1</span>] </a>
+<a class="sourceLine" id="cb76-5" data-line-number="5">test_<span class="dv">1</span>&lt;-<span class="kw">select</span>(test_<span class="dv">1</span>, <span class="op">-</span>SalePrice)</a>
+<a class="sourceLine" id="cb76-6" data-line-number="6">train_<span class="dv">1</span><span class="op">$</span>SalePrice&lt;-<span class="st"> </span><span class="kw">log</span>(train_<span class="dv">1</span><span class="op">$</span>SalePrice)</a>
+<a class="sourceLine" id="cb76-7" data-line-number="7">test_ID&lt;-data_final[<span class="dv">1457</span><span class="op">:</span><span class="dv">2915</span>,<span class="dv">1</span>]</a></code></pre></div>
+<div id="multivariate-linear-regression-model" class="section level2">
+<h2><span class="header-section-number">4.1</span> Multivariate Linear Regression Model</h2>
+<p>We start by fitting a multivariate linear regression model to illustrate the issue of multicollinearity present in our data. The model returns a warning: “Coefficients: (4 not defined because of singularities)”. This is due to variables that have perfect multicollinearity, so we find those variables and remove them.</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1"><span class="co">#Fit Linear Model</span></a>
+<a class="sourceLine" id="cb77-2" data-line-number="2">ml_model&lt;-<span class="st"> </span><span class="kw">lm</span>(SalePrice <span class="op">~</span><span class="st"> </span>., train_<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb77-3" data-line-number="3"><span class="kw">summary</span>(ml_model)</a></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = SalePrice ~ ., data = train_1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.69436 -0.05306  0.00131  0.05573  0.50403 
+## 
+## Coefficients: (4 not defined because of singularities)
+##                         Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)            8.495e+00  5.306e-01  16.010  &lt; 2e-16 ***
+## MSSubClass            -5.914e-04  3.658e-04  -1.617 0.106167    
+## LotFrontage            3.249e-04  1.870e-04   1.737 0.082545 .  
+## LotArea                1.340e-06  4.116e-07   3.256 0.001159 ** 
+## Utilities              1.214e-01  5.864e-02   2.071 0.038547 *  
+## LandSlope             -2.158e-03  1.565e-02  -0.138 0.890348    
+## OverallQual            2.964e-02  1.235e-02   2.400 0.016534 *  
+## OverallCond            1.903e-02  1.236e-02   1.540 0.123864    
+## MasVnrArea             2.959e-05  2.518e-05   1.175 0.240064    
+## ExterQual              2.697e-02  1.321e-02   2.043 0.041303 *  
+## BsmtExposure           1.136e-02  3.740e-03   3.037 0.002435 ** 
+## BsmtUnfSF             -7.757e-05  9.950e-06  -7.796 1.30e-14 ***
+## TotalBsmtSF            1.690e-04  1.645e-05  10.275  &lt; 2e-16 ***
+## HeatingQC              1.582e-02  4.236e-03   3.734 0.000197 ***
+## CentralAir             7.256e-02  1.670e-02   4.346 1.49e-05 ***
+## Electrical            -5.148e-03  1.162e-02  -0.443 0.657835    
+## LowQualFinSF          -3.450e-05  7.883e-05  -0.438 0.661748    
+## GrLivArea              2.430e-04  1.816e-05  13.381  &lt; 2e-16 ***
+## BedroomAbvGr          -7.802e-03  5.881e-03  -1.327 0.184878    
+## TotRmsAbvGrd           6.069e-03  4.117e-03   1.474 0.140635    
+## Functional             6.326e-02  8.454e-03   7.482 1.34e-13 ***
+## Fireplaces             1.334e-02  1.039e-02   1.284 0.199221    
+## FireplaceQu            4.493e-03  3.714e-03   1.210 0.226548    
+## GarageFinish           6.688e-03  5.304e-03   1.261 0.207606    
+## GarageCars             2.726e-02  1.003e-02   2.717 0.006672 ** 
+## PavedDrive             1.629e-02  7.232e-03   2.252 0.024482 *  
+## WoodDeckSF             7.376e-05  2.624e-05   2.811 0.005019 ** 
+## PoolArea               1.883e-04  9.372e-05   2.009 0.044747 *  
+## Fence                 -2.641e-03  2.698e-03  -0.979 0.327872    
+## MiscVal                1.259e-05  2.709e-05   0.465 0.642314    
+## NewBuild              -2.413e-03  1.961e-02  -0.123 0.902113    
+## BSmtFinSFComb                 NA         NA      NA       NA    
+## TotalArea                     NA         NA      NA       NA    
+## TotalBaths             2.609e-02  6.748e-03   3.867 0.000116 ***
+## PorchSF                1.649e-04  3.176e-05   5.194 2.39e-07 ***
+## Neigh_Cat              3.822e-02  4.766e-03   8.019 2.37e-15 ***
+## AgeCat                 2.631e-02  7.014e-03   3.750 0.000184 ***
+## LastSold               2.458e-03  2.287e-03   1.075 0.282674    
+## RemodelFromCat         3.273e-03  2.633e-03   1.243 0.214018    
+## SeasonSale             6.639e-03  4.002e-03   1.659 0.097356 .  
+## GarageScore            3.546e-03  2.107e-03   1.683 0.092565 .  
+## OverallScore           3.778e-03  2.132e-03   1.772 0.076620 .  
+## ExterScore            -6.642e-03  2.923e-03  -2.273 0.023202 *  
+## KitchenScore           3.653e-03  5.379e-03   0.679 0.497210    
+## GarageGrade            1.733e-05  8.111e-06   2.136 0.032849 *  
+## MSSubClass.1                  NA         NA      NA       NA    
+## MSZoning.FV            4.157e-01  4.385e-02   9.479  &lt; 2e-16 ***
+## MSZoning.RH            4.071e-01  4.882e-02   8.339  &lt; 2e-16 ***
+## MSZoning.RL            4.066e-01  4.074e-02   9.979  &lt; 2e-16 ***
+## MSZoning.RM            3.531e-01  4.056e-02   8.707  &lt; 2e-16 ***
+## Street.Pave            3.815e-02  5.210e-02   0.732 0.464122    
+## Alley.None             2.037e-02  1.789e-02   1.138 0.255168    
+## Alley.Pave             3.381e-02  2.662e-02   1.270 0.204237    
+## LotShape.IR2           2.498e-02  1.872e-02   1.334 0.182286    
+## LotShape.IR3           5.335e-05  3.947e-02   0.001 0.998922    
+## LotShape.Reg          -4.993e-04  7.190e-03  -0.069 0.944651    
+## LandContour.HLS        2.744e-02  2.235e-02   1.227 0.219889    
+## LandContour.Low       -1.192e-02  2.806e-02  -0.425 0.670947    
+## LandContour.Lvl       -4.264e-03  1.629e-02  -0.262 0.793621    
+## LotConfig.CulDSac      3.111e-02  1.530e-02   2.033 0.042280 *  
+## LotConfig.FR2         -2.522e-02  1.802e-02  -1.400 0.161849    
+## LotConfig.FR3         -6.387e-02  5.754e-02  -1.110 0.267177    
+## LotConfig.Inside      -7.316e-03  8.140e-03  -0.899 0.368956    
+## Condition1.Feedr       4.951e-02  2.187e-02   2.263 0.023770 *  
+## Condition1.Norm        9.994e-02  1.810e-02   5.521 4.07e-08 ***
+## Condition1.PosA        5.640e-02  4.502e-02   1.253 0.210481    
+## Condition1.PosN        8.356e-02  3.281e-02   2.547 0.010983 *  
+## Condition1.RRAe        5.565e-03  3.824e-02   0.146 0.884311    
+## Condition1.RRAn        8.021e-02  2.999e-02   2.674 0.007581 ** 
+## Condition1.RRNe        4.897e-02  7.912e-02   0.619 0.536051    
+## Condition1.RRNn        1.060e-01  5.692e-02   1.862 0.062770 .  
+## Condition2.Feedr       1.046e-01  1.024e-01   1.021 0.307270    
+## Condition2.Norm        6.743e-02  8.762e-02   0.770 0.441688    
+## Condition2.PosA        1.426e-01  1.524e-01   0.936 0.349701    
+## Condition2.PosN       -5.864e-02  1.440e-01  -0.407 0.683887    
+## Condition2.RRAe       -2.268e-01  2.909e-01  -0.780 0.435698    
+## Condition2.RRAn       -5.888e-02  1.413e-01  -0.417 0.676949    
+## Condition2.RRNn        4.416e-02  1.197e-01   0.369 0.712312    
+## BldgType.2fmCon        3.452e-02  5.406e-02   0.639 0.523232    
+## BldgType.Duplex       -1.800e-02  2.965e-02  -0.607 0.543816    
+## BldgType.Twnhs        -1.806e-02  4.290e-02  -0.421 0.673793    
+## BldgType.TwnhsE        2.163e-02  3.905e-02   0.554 0.579707    
+## HouseStyle.1.5Unf      2.946e-02  3.300e-02   0.893 0.372054    
+## HouseStyle.1Story     -2.047e-02  1.639e-02  -1.248 0.212096    
+## HouseStyle.2.5Fin     -8.517e-02  5.248e-02  -1.623 0.104827    
+## HouseStyle.2.5Unf      1.737e-02  3.999e-02   0.434 0.664057    
+## HouseStyle.2Story     -9.424e-03  1.388e-02  -0.679 0.497180    
+## HouseStyle.SFoyer      2.553e-03  2.659e-02   0.096 0.923525    
+## HouseStyle.SLvl        1.744e-02  2.311e-02   0.755 0.450630    
+## RoofStyle.Gable        1.405e-02  8.105e-02   0.173 0.862408    
+## RoofStyle.Gambrel      1.347e-02  8.858e-02   0.152 0.879136    
+## RoofStyle.Hip          1.969e-02  8.133e-02   0.242 0.808764    
+## RoofStyle.Mansard      6.104e-02  9.486e-02   0.644 0.520004    
+## RoofStyle.Shed         2.584e-01  1.521e-01   1.699 0.089570 .  
+## RoofMatl.Membran       1.996e-01  1.378e-01   1.449 0.147622    
+## RoofMatl.Metal         5.291e-02  1.393e-01   0.380 0.704163    
+## RoofMatl.Roll         -7.097e-02  1.147e-01  -0.619 0.536230    
+## RoofMatl.Tar.Grv       3.326e-02  8.162e-02   0.408 0.683676    
+## RoofMatl.WdShake      -9.881e-02  6.704e-02  -1.474 0.140752    
+## RoofMatl.WdShngl       1.153e-01  5.264e-02   2.190 0.028723 *  
+## Heating.GasA           5.892e-02  1.105e-01   0.533 0.593931    
+## Heating.GasW           1.278e-01  1.137e-01   1.124 0.261192    
+## Heating.Grav          -4.177e-02  1.178e-01  -0.355 0.722974    
+## Heating.OthW           1.040e-02  1.369e-01   0.076 0.939482    
+## Heating.Wall           1.247e-01  1.276e-01   0.977 0.328685    
+## Exterior1st.AsphShn   -2.263e-02  1.493e-01  -0.152 0.879574    
+## Exterior1st.BrkComm   -3.287e-01  1.107e-01  -2.969 0.003044 ** 
+## Exterior1st.BrkFace    4.319e-02  5.494e-02   0.786 0.432012    
+## Exterior1st.CBlock    -1.270e-01  1.143e-01  -1.111 0.266780    
+## Exterior1st.CemntBd   -4.028e-02  8.327e-02  -0.484 0.628668    
+## Exterior1st.HdBoard   -4.256e-02  5.534e-02  -0.769 0.442007    
+## Exterior1st.ImStucc   -1.009e-01  1.264e-01  -0.798 0.424812    
+## Exterior1st.MetalSd   -1.508e-02  6.326e-02  -0.238 0.811585    
+## Exterior1st.Plywood   -5.533e-02  5.467e-02  -1.012 0.311643    
+## Exterior1st.Stone     -3.110e-02  1.052e-01  -0.296 0.767641    
+## Exterior1st.Stucco    -1.502e-02  6.068e-02  -0.247 0.804565    
+## Exterior1st.VinylSd   -3.435e-02  5.891e-02  -0.583 0.559919    
+## Exterior1st.Wd.Sdng   -7.155e-02  5.309e-02  -1.348 0.177940    
+## Exterior1st.WdShing   -2.734e-02  5.738e-02  -0.476 0.633872    
+## Exterior2nd.AsphShn    5.852e-02  9.899e-02   0.591 0.554476    
+## Exterior2nd.Brk.Cmn    1.229e-01  7.388e-02   1.664 0.096441 .  
+## Exterior2nd.BrkFace    1.025e-03  5.786e-02   0.018 0.985863    
+## Exterior2nd.CBlock            NA         NA      NA       NA    
+## Exterior2nd.CmentBd    7.596e-02  8.275e-02   0.918 0.358781    
+## Exterior2nd.HdBoard    4.847e-02  5.396e-02   0.898 0.369303    
+## Exterior2nd.ImStucc    5.815e-02  6.430e-02   0.904 0.366003    
+## Exterior2nd.MetalSd    4.833e-02  6.240e-02   0.775 0.438741    
+## Exterior2nd.Other      2.814e-03  1.221e-01   0.023 0.981614    
+## Exterior2nd.Plywood    5.665e-02  5.234e-02   1.082 0.279266    
+## Exterior2nd.Stone      1.793e-02  7.471e-02   0.240 0.810416    
+## Exterior2nd.Stucco     7.762e-03  6.024e-02   0.129 0.897496    
+## Exterior2nd.VinylSd    5.862e-02  5.735e-02   1.022 0.306916    
+## Exterior2nd.Wd.Sdng    7.747e-02  5.208e-02   1.487 0.137145    
+## Exterior2nd.Wd.Shng    3.281e-02  5.468e-02   0.600 0.548544    
+## MasVnrType.BrkFace     3.287e-02  3.006e-02   1.093 0.274443    
+## MasVnrType.None        3.255e-02  3.025e-02   1.076 0.282046    
+## MasVnrType.Stone       6.150e-02  3.190e-02   1.928 0.054062 .  
+## Foundation.CBlock      2.373e-02  1.352e-02   1.755 0.079556 .  
+## Foundation.PConc       5.838e-02  1.486e-02   3.929 8.99e-05 ***
+## Foundation.Slab        1.778e-02  3.359e-02   0.529 0.596572    
+## Foundation.Stone       6.588e-02  4.885e-02   1.349 0.177674    
+## Foundation.Wood       -1.143e-01  6.609e-02  -1.729 0.084071 .  
+## GarageType.Attchd      7.806e-02  4.900e-02   1.593 0.111427    
+## GarageType.Basment     8.750e-02  5.646e-02   1.550 0.121436    
+## GarageType.BuiltIn     8.486e-02  5.100e-02   1.664 0.096322 .  
+## GarageType.CarPort     8.145e-02  6.365e-02   1.280 0.200876    
+## GarageType.Detchd      8.185e-02  4.877e-02   1.678 0.093563 .  
+## GarageType.None        9.647e-02  5.876e-02   1.642 0.100887    
+## SaleType.Con           1.265e-01  8.021e-02   1.578 0.114889    
+## SaleType.ConLD         1.217e-01  4.362e-02   2.790 0.005349 ** 
+## SaleType.ConLI        -2.227e-02  5.275e-02  -0.422 0.672925    
+## SaleType.ConLw         8.338e-03  5.422e-02   0.154 0.877812    
+## SaleType.CWD           1.003e-01  5.874e-02   1.708 0.087805 .  
+## SaleType.New           1.630e-01  6.970e-02   2.338 0.019529 *  
+## SaleType.Oth           9.708e-02  6.704e-02   1.448 0.147865    
+## SaleType.WD           -3.658e-03  1.893e-02  -0.193 0.846788    
+## SaleCondition.AdjLand  7.040e-02  6.259e-02   1.125 0.260898    
+## SaleCondition.Alloca   6.623e-02  3.841e-02   1.724 0.084886 .  
+## SaleCondition.Family   1.107e-02  2.787e-02   0.397 0.691399    
+## SaleCondition.Normal   6.958e-02  1.305e-02   5.330 1.15e-07 ***
+## SaleCondition.Partial -4.676e-02  6.687e-02  -0.699 0.484474    
+## MiscFeature.None       1.397e-01  4.332e-01   0.322 0.747158    
+## MiscFeature.Othr       8.469e-02  3.997e-01   0.212 0.832240    
+## MiscFeature.Shed       1.262e-01  4.151e-01   0.304 0.761101    
+## MiscFeature.TenC      -1.627e-01  4.020e-01  -0.405 0.685704    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1062 on 1295 degrees of freedom
+## Multiple R-squared:  0.936,  Adjusted R-squared:  0.9281 
+## F-statistic: 118.4 on 160 and 1295 DF,  p-value: &lt; 2.2e-16</code></pre>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1"><span class="co">#identify the linearly dependent variables</span></a>
+<a class="sourceLine" id="cb79-2" data-line-number="2">ld_vars &lt;-<span class="st"> </span><span class="kw">attributes</span>(<span class="kw">alias</span>(ml_model)<span class="op">$</span>Complete)<span class="op">$</span>dimnames[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb79-3" data-line-number="3"><span class="co">#remove the linearly dependent variables variables</span></a>
+<a class="sourceLine" id="cb79-4" data-line-number="4">train_ld&lt;-<span class="kw">select</span>(train_<span class="dv">1</span>, <span class="op">-</span><span class="kw">all_of</span>(ld_vars))</a></code></pre></div>
+<p>Then, we fit the model again, and take a closer look at the the Variance Inflation Factors (VIFs), which measure extent to which a predictor is correlated with the other predictor variables. As we can see in the output, we find high levels of multicollinearity with VIF values greater than 10 in many cases. Ideally, we would like to keep the VIF values below 5.</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1"><span class="co">#run model again</span></a>
+<a class="sourceLine" id="cb80-2" data-line-number="2">ml_model_new &lt;-<span class="kw">lm</span>(SalePrice <span class="op">~</span><span class="st"> </span>., train_ld)</a></code></pre></div>
+<p><strong>Inspect the Variance Inflation Factors</strong></p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" data-line-number="1"><span class="kw">vif</span>(ml_model_new)</a></code></pre></div>
+<pre><code>##            MSSubClass           LotFrontage               LotArea 
+##             30.983647              2.470684              2.125854 
+##             Utilities             LandSlope           OverallQual 
+##              1.219122              2.417453             36.931049 
+##           OverallCond            MasVnrArea             ExterQual 
+##             24.473003              2.563339              7.317738 
+##          BsmtExposure             BsmtUnfSF           TotalBsmtSF 
+##              2.038810              2.498255              5.929023 
+##             HeatingQC            CentralAir            Electrical 
+##              2.133314              2.195581              1.561926 
+##          LowQualFinSF             GrLivArea          BedroomAbvGr 
+##              1.901055             10.507752              2.970499 
+##          TotRmsAbvGrd            Functional            Fireplaces 
+##              5.681774              1.446358              5.567577 
+##           FireplaceQu          GarageFinish            GarageCars 
+##              5.826712              2.885926              7.079632 
+##            PavedDrive            WoodDeckSF              PoolArea 
+##              1.668464              1.392981              1.419251 
+##                 Fence               MiscVal              NewBuild 
+##              1.362146             23.381710              4.911904 
+##            TotalBaths               PorchSF             Neigh_Cat 
+##              3.557811              1.431181              3.325601 
+##                AgeCat              LastSold        RemodelFromCat 
+##              6.724464              1.193224              2.642765 
+##            SeasonSale           GarageScore          OverallScore 
+##              1.137311              8.133184             49.407995 
+##            ExterScore          KitchenScore           GarageGrade 
+##              4.853052              2.737940              6.403865 
+##           MSZoning.FV           MSZoning.RH           MSZoning.RL 
+##             10.592837              3.344599             35.842404 
+##           MSZoning.RM           Street.Pave            Alley.None 
+##             27.045870              1.438511              2.422478 
+##            Alley.Pave          LotShape.IR2          LotShape.IR3 
+##              2.503946              1.238556              1.235801 
+##          LotShape.Reg       LandContour.HLS       LandContour.Low 
+##              1.546704              2.139764              2.451706 
+##       LandContour.Lvl     LotConfig.CulDSac         LotConfig.FR2 
+##              3.112040              1.826317              1.309673 
+##         LotConfig.FR3      LotConfig.Inside      Condition1.Feedr 
+##              1.171462              1.718256              3.208643 
+##       Condition1.Norm       Condition1.PosA       Condition1.PosN 
+##              4.972023              1.429983              1.697261 
+##       Condition1.RRAe       Condition1.RRAn       Condition1.RRNe 
+##              1.415759              2.037224              1.108994 
+##       Condition1.RRNn      Condition2.Feedr       Condition2.Norm 
+##              1.431950              5.558168              9.441338 
+##       Condition2.PosA       Condition2.PosN       Condition2.RRAe 
+##              2.058543              1.837783              7.498325 
+##       Condition2.RRAn       Condition2.RRNn       BldgType.2fmCon 
+##              1.769292              2.539791              7.865580 
+##       BldgType.Duplex        BldgType.Twnhs       BldgType.TwnhsE 
+##              3.909723              6.811730             14.211555 
+##     HouseStyle.1.5Unf     HouseStyle.1Story     HouseStyle.2.5Fin 
+##              1.339025              8.676608              1.943176 
+##     HouseStyle.2.5Unf     HouseStyle.2Story     HouseStyle.SFoyer 
+##              1.548757              5.250288              2.261303 
+##       HouseStyle.SLvl       RoofStyle.Gable     RoofStyle.Gambrel 
+##              2.941887            144.148227              7.597002 
+##         RoofStyle.Hip     RoofStyle.Mansard        RoofStyle.Shed 
+##            133.758957              5.559546              4.097060 
+##      RoofMatl.Membran        RoofMatl.Metal         RoofMatl.Roll 
+##              1.682526              1.720093              1.166139 
+##      RoofMatl.Tar.Grv      RoofMatl.WdShake      RoofMatl.WdShngl 
+##              6.450158              1.986501              1.224843 
+##          Heating.GasA          Heating.GasW          Heating.Grav 
+##             33.888788             20.383640              8.574881 
+##          Heating.OthW          Heating.Wall   Exterior1st.AsphShn 
+##              3.320637              5.761418              1.976400 
+##   Exterior1st.BrkComm   Exterior1st.BrkFace    Exterior1st.CBlock 
+##              2.172081             12.927967              1.157706 
+##   Exterior1st.CemntBd   Exterior1st.HdBoard   Exterior1st.ImStucc 
+##             35.375768             50.914795              1.417138 
+##   Exterior1st.MetalSd   Exterior1st.Plywood     Exterior1st.Stone 
+##             66.278376             26.505523              1.961641 
+##    Exterior1st.Stucco   Exterior1st.VinylSd   Exterior1st.Wd.Sdng 
+##              7.709559            102.465002             44.025069 
+##   Exterior1st.WdShing   Exterior2nd.AsphShn   Exterior2nd.Brk.Cmn 
+##              7.457993              2.601873              3.372932 
+##   Exterior2nd.BrkFace   Exterior2nd.CmentBd   Exterior2nd.HdBoard 
+##              7.294757             34.379097             45.681446 
+##   Exterior2nd.ImStucc   Exterior2nd.MetalSd     Exterior2nd.Other 
+##              3.280025             63.046316              1.321348 
+##   Exterior2nd.Plywood     Exterior2nd.Stone    Exterior2nd.Stucco 
+##             31.136379              2.467118              7.909456 
+##   Exterior2nd.VinylSd   Exterior2nd.Wd.Sdng   Exterior2nd.Wd.Shng 
+##             96.147013             40.984547              9.813104 
+##    MasVnrType.BrkFace       MasVnrType.None      MasVnrType.Stone 
+##             24.733962             28.401976             10.387808 
+##     Foundation.CBlock      Foundation.PConc       Foundation.Slab 
+##              5.806813              7.031170              2.361712 
+##      Foundation.Stone       Foundation.Wood     GarageType.Attchd 
+##              1.264687              1.159983             74.698954 
+##    GarageType.Basment    GarageType.BuiltIn    GarageType.CarPort 
+##              5.301258             18.867666              3.214034 
+##     GarageType.Detchd       GarageType.None          SaleType.Con 
+##             59.952842             23.426135              1.139684 
+##        SaleType.ConLD        SaleType.ConLI        SaleType.ConLw 
+##              1.509614              1.229721              1.299290 
+##          SaleType.CWD          SaleType.New          SaleType.Oth 
+##              1.220638             47.439700              1.193552 
+##           SaleType.WD SaleCondition.AdjLand  SaleCondition.Alloca 
+##              5.274011              1.385924              1.557201 
+##  SaleCondition.Family  SaleCondition.Normal SaleCondition.Partial 
+##              1.359023              3.217916             44.657412 
+##      MiscFeature.None      MiscFeature.Othr      MiscFeature.Shed 
+##            865.674765             28.304742            723.737076 
+##      MiscFeature.TenC 
+##             14.326448</code></pre>
+<p><strong>Dealing with Multicollinearity</strong></p>
+<p>The curse of dimensionality refers to the phenomenon that many types of data analysis become significantly harder as the dimensionality of the data increases (<span class="citation">Tan et al. (2019)</span>). As more variables get added and the complexity of the patterns increase, the training of the model becomes more time consuming and the predictive power decreases.</p>
+<p>Multicollinearity for example, is a common problem in high‐dimensional data. Multicollinearity occurs when two or more predictor variables are highly correlated, and becomes a problem in many prediction settings. It is specially problematic in regression, since one of the assumptions of linear regression is the absence of multicollinearity and auto-correlation. As the number of features grow, regression models tend to over-fit the training data, causing the sample error to increase.</p>
+<p>Some approaches for dimensionality reduction are linear algebra based techniques such as Principal Component Analysis(PCA), which finds new attributes (principal components) that are linear combinations of the original attributes orthogonal to each other, and which capture the maximum amount of variation in the data. Another approach is a filter method, where the features are selected prior to modeling for their statistical value to the model, for example when features are selected for their correlation value with the predicted variable. Wrapper, methods are also popular, these include Forward and Backward Elimination. There are also some algorithms that have their built in functions for feature selection, like Lasso regression.</p>
+<p>This analysis deals with some of the issues that arise from high dimensionality by implementing regularized regression using the glmnet package <span class="citation">(Friedman, Hastie, and Tibshirani 2010)</span>. We will also implement a wrapper method with a model called Boruta <span class="citation">(Kursa and Rudnicki 2010)</span> to do feature selection prior to fitting a gradient boosted model with the xgboost package<span class="citation">(Chen et al. 2021)</span>.</p>
+</div>
+<div id="model-selection" class="section level2">
+<h2><span class="header-section-number">4.2</span> Model Selection</h2>
+<p>One of the ways to deal with high multicollinearity is through regularization. Regularization is a regression technique, which limits, regulates or shrinks the estimated coefficient towards zero, which can reduce the variance and decrease out of sample error <span class="citation">(Boehmke and Greenwell 2020)</span>. This technique does not encourage learning of more complex models, and so it avoids the risk of over-fitting.</p>
+<p>Three regularization methods that help with collinearity and over-fitting are:</p>
+<ul>
+<li>Lasso, penalizes the number of non-zero coefficients</li>
+<li>Ridge, penalizes the absolute magnitude of the coefficients</li>
+<li>Elastic Net, a mixed method closely linked to lasso and ridge regression</li>
+</ul>
+<p>In addition to the methods listed above, we will also try a different approach using feature subset selection with the Boruta package <span class="citation">(Kursa and Rudnicki 2010)</span> prior to fitting a gradient boosted tree, with the XGBoost package.</p>
+<p><strong>Model Selection</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Model</th>
+<th align="left">Model Type</th>
+<th align="left">Tuning Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Lasso</td>
+<td align="left">Regularization</td>
+<td align="left">lambda</td>
+</tr>
+<tr class="even">
+<td align="left">Ridge</td>
+<td align="left">Regularization</td>
+<td align="left">lambda</td>
+</tr>
+<tr class="odd">
+<td align="left">Elastic</td>
+<td align="left">Regularization</td>
+<td align="left">lambda</td>
+</tr>
+<tr class="even">
+<td align="left">xgboost</td>
+<td align="left">Extreme Gradient Boosting</td>
+<td align="left">general &amp; tree booster parameters</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="regularized-regression-models" class="section level2">
+<h2><span class="header-section-number">4.3</span> Regularized Regression Models</h2>
+<p>The lasso model penalty is controlled by setting alpha=1, likewise the ridge penalty is controlled by alpha=0. The elastic-net penalty is controlled by alpha between 0 and 1. The tuning parameter lambda controls the overall strength of the penalty.</p>
+<div id="identify-the-optimal-lambda-parameter" class="section level3">
+<h3><span class="header-section-number">4.3.1</span> Identify the Optimal Lambda Parameter</h3>
+<p>To identify the optimal lambda value we used 10-fold cross-validation (CV) with cv.glmnet() from the glmnet package <span class="citation">(Friedman, Hastie, and Tibshirani 2010)</span>. We selected the minimum lambda value as the metric to determine the optimal lambda value.</p>
+<p>The figures show the 10-fold CV MSE across all the log lamda values. The numbers across the top of the plot are the number of features in the model. The first dashed line represents the log lamda value with the minimum MSE, and the second is the largest log lamda value within one standard error of it.</p>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb83-1" data-line-number="1">train_x2&lt;-<span class="kw">select</span>(train_x, <span class="op">-</span>SalePrice)</a>
+<a class="sourceLine" id="cb83-2" data-line-number="2">test_x2&lt;-<span class="kw">select</span>(test_x, <span class="op">-</span>SalePrice)</a>
+<a class="sourceLine" id="cb83-3" data-line-number="3">train_y&lt;-<span class="st"> </span><span class="kw">log</span>(train_final<span class="op">$</span>SalePrice)</a></code></pre></div>
+<p><strong>Ridge Model</strong>*</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb84-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb84-2" data-line-number="2">glm_cv_ridge &lt;-<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(train_x2), train_y, <span class="dt">alpha =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb84-3" data-line-number="3">glm_cv_ridge</a></code></pre></div>
+<pre><code>## 
+## Call:  cv.glmnet(x = as.matrix(train_x2), y = train_y, alpha = 0) 
+## 
+## Measure: Mean-Squared Error 
+## 
+##      Lambda Index Measure        SE Nonzero
+## min 0.03246   100 0.01352 0.0009632      75
+## 1se 0.17325    82 0.01445 0.0010423      75</code></pre>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb86-1" data-line-number="1"><span class="kw">plot</span>(glm_cv_ridge)</a></code></pre></div>
+<div class="figure"><span id="fig:RidgeFit"></span>
+<img src="HousePrices_Project1_files/figure-html/RidgeFit-1.png" alt="Ridge Optimal Lamda" width="672" />
+<p class="caption">
+Figure 4.1: Ridge Optimal Lamda
+</p>
+</div>
+<pre><code>## The optimal lambda value selected for the ridge model is:  0.03246428</code></pre>
+<pre><code>## And the ridge model retains all features, that is 75 features in total.</code></pre>
+<p><strong>Lasso Model</strong>*</p>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb89-2" data-line-number="2">glm_cv_lasso &lt;-<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(train_x2), train_y, <span class="dt">alpha =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb89-3" data-line-number="3">glm_cv_lasso</a></code></pre></div>
+<pre><code>## 
+## Call:  cv.glmnet(x = as.matrix(train_x2), y = train_y, alpha = 1) 
+## 
+## Measure: Mean-Squared Error 
+## 
+##       Lambda Index Measure        SE Nonzero
+## min 0.001222    61 0.01346 0.0009675      51
+## 1se 0.007857    41 0.01429 0.0011390      33</code></pre>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb91-1" data-line-number="1"><span class="kw">plot</span>(glm_cv_lasso)</a></code></pre></div>
+<div class="figure"><span id="fig:LassoFit"></span>
+<img src="HousePrices_Project1_files/figure-html/LassoFit-1.png" alt="Lasso Optimal Lamda" width="672" />
+<p class="caption">
+Figure 4.2: Lasso Optimal Lamda
+</p>
+</div>
+<pre><code>## The optimal lambda value selected for the lasso model is: 0.001222259</code></pre>
+<pre><code>## And the number of features to be retained is: 51</code></pre>
+<p><strong>Elastic Net Model </strong>*</p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb94-2" data-line-number="2">glm_cv_net&lt;-<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">data.matrix</span>(train_x2), train_y, <span class="dt">alpha =</span> <span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb94-3" data-line-number="3">glm_cv_net</a></code></pre></div>
+<pre><code>## 
+## Call:  cv.glmnet(x = data.matrix(train_x2), y = train_y, alpha = 0.1) 
+## 
+## Measure: Mean-Squared Error 
+## 
+##      Lambda Index Measure       SE Nonzero
+## min 0.01114    62 0.01342 0.000971      55
+## 1se 0.06523    43 0.01426 0.001123      44</code></pre>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb96-1" data-line-number="1"><span class="kw">plot</span>(glm_cv_net)</a></code></pre></div>
+<div class="figure"><span id="fig:modelfitnet"></span>
+<img src="HousePrices_Project1_files/figure-html/modelfitnet-1.png" alt="Elastic Net Optimal Lamda" width="672" />
+<p class="caption">
+Figure 4.3: Elastic Net Optimal Lamda
+</p>
+</div>
+<pre><code>## The optimal lambda value selected for the Elastic Net model is: 0.01113677</code></pre>
+<pre><code>## And the number of features to be retained is: 55</code></pre>
+</div>
+</div>
+<div id="training-the-regularized-regression-models" class="section level2">
+<h2><span class="header-section-number">4.4</span> Training the Regularized Regression Models</h2>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb99-1" data-line-number="1"><span class="co">#Select lambda that reduces error</span></a>
+<a class="sourceLine" id="cb99-2" data-line-number="2">penalty_ridge &lt;-<span class="st"> </span>glm_cv_ridge<span class="op">$</span>lambda.min</a>
+<a class="sourceLine" id="cb99-3" data-line-number="3">penalty_lasso &lt;-<span class="st"> </span>glm_cv_lasso<span class="op">$</span>lambda.min</a>
+<a class="sourceLine" id="cb99-4" data-line-number="4">penalty_net &lt;-<span class="st"> </span>glm_cv_net<span class="op">$</span>lambda.min</a>
+<a class="sourceLine" id="cb99-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb99-6" data-line-number="6"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb99-7" data-line-number="7">glm_ridge_mod &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="dt">x =</span> <span class="kw">as.matrix</span>(train_x2), <span class="dt">y =</span> train_y, <span class="dt">alpha =</span> <span class="dv">0</span>, <span class="dt">lambda =</span> penalty_ridge,<span class="dt">standardize =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb99-8" data-line-number="8">glm_lasso_mod &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="dt">x =</span> <span class="kw">as.matrix</span>(train_x2), <span class="dt">y =</span> train_y, <span class="dt">alpha =</span> <span class="dv">1</span>, <span class="dt">lambda =</span> penalty_lasso,<span class="dt">standardize =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb99-9" data-line-number="9">glm_net_mod &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="dt">x =</span> <span class="kw">as.matrix</span>(train_x2), <span class="dt">y =</span> train_y, <span class="dt">alpha =</span> <span class="fl">0.1</span>, <span class="dt">lambda =</span> penalty_net,<span class="dt">standardize =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+</div>
+<div id="evaluating-the-regularized-regression-models-performance" class="section level2">
+<h2><span class="header-section-number">4.5</span> Evaluating the Regularized Regression Models’ Performance</h2>
+<p>The performance accuracy of the models was evaluated by comparing the predictions of each model with the actual sale prices in the training data. The graphs below show the predicted vs true Sale Price, and the score is the Root-Mean-Square Error(RMSE), which is the same metric Kaggle uses in its prediction evaluation for prediction submissions. The smaller the RMSE value the better, and the closer the dots are to the red dashed line, the closer the predicted values are to the actual values (this is based the on training data-set).</p>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" data-line-number="1"><span class="kw">plot</span>(y_pred_ridge,train_y)</a>
+<a class="sourceLine" id="cb100-2" data-line-number="2"><span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">1</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>, <span class="dt">lwd=</span><span class="dv">3</span>, <span class="dt">lty=</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="figure">
+<img src="HousePrices_Project1_files/figure-html/plot_pred_ridge-1.png" alt="Ridge Fit" width="672" />
+<p class="caption">
+(#fig:plot_pred_ridge)Ridge Fit
+</p>
+</div>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb101-1" data-line-number="1"><span class="kw">plot</span>(y_pred_lasso,train_y)</a>
+<a class="sourceLine" id="cb101-2" data-line-number="2"><span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">1</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>, <span class="dt">lwd=</span><span class="dv">3</span>, <span class="dt">lty=</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="figure">
+<img src="HousePrices_Project1_files/figure-html/plot_pred_lasso-1.png" alt="Lasso Fit" width="672" />
+<p class="caption">
+(#fig:plot_pred_lasso)Lasso Fit
+</p>
+</div>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" data-line-number="1"><span class="kw">plot</span>(y_pred_net,train_y)</a>
+<a class="sourceLine" id="cb102-2" data-line-number="2"><span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">1</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>, <span class="dt">lwd=</span><span class="dv">3</span>, <span class="dt">lty=</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="figure">
+<img src="HousePrices_Project1_files/figure-html/plot_pred_net-1.png" alt="Elastic Net Fit" width="672" />
+<p class="caption">
+(#fig:plot_pred_net)Elastic Net Fit
+</p>
+</div>
+<p>The three regression models Lasso, Ridge, and Elastic Net performed similarly during training, with RMSE of about 0.11. The choice for best model is the Elastic Net model, because it includes fewer features, so it is a simpler model.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Models
+</th>
+<th style="text-align:right;">
+Parameters
+</th>
+<th style="text-align:right;">
+Features
+</th>
+<th style="text-align:right;">
+Rsquared
+</th>
+<th style="text-align:right;">
+Corr
+</th>
+<th style="text-align:right;">
+RMSE
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Ridge
+</td>
+<td style="text-align:right;">
+0.0324643
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0.9222852
+</td>
+<td style="text-align:right;">
+0.9604194
+</td>
+<td style="text-align:right;">
+0.1103787
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lasso
+</td>
+<td style="text-align:right;">
+0.0012223
+</td>
+<td style="text-align:right;">
+51
+</td>
+<td style="text-align:right;">
+0.9226179
+</td>
+<td style="text-align:right;">
+0.9605517
+</td>
+<td style="text-align:right;">
+0.1101422
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Elastic Net
+</td>
+<td style="text-align:right;">
+0.0111368
+</td>
+<td style="text-align:right;">
+55
+</td>
+<td style="text-align:right;">
+0.9223046
+</td>
+<td style="text-align:right;">
+0.9604168
+</td>
+<td style="text-align:right;">
+0.1103650
+</td>
+</tr>
+</tbody>
+</table>
+<p>Among the top features selected by the Elastic Net model, are several of the features created during the feature engineering phase. For example, the Total Area, Neighborhodd Category, Overall Score, Total Baths, and Age Category are in the top most important features, and all of these were the result of feature engineering.</p>
+<div class="figure">
+<img src="HousePrices_Project1_files/figure-html/net_features-1.png" alt="Elastic Net Features" width="672" />
+<p class="caption">
+(#fig:net_features)Elastic Net Features
+</p>
+</div>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb103-1" data-line-number="1">lassoVarImp &lt;-<span class="st"> </span><span class="kw">varImp</span>(glm_lasso_mod,<span class="dt">scale=</span>F, <span class="dt">lambda =</span> penalty_lasso)</a>
+<a class="sourceLine" id="cb103-2" data-line-number="2">lassoImportance &lt;-<span class="st"> </span>lassoVarImp<span class="op">$</span>importance</a>
+<a class="sourceLine" id="cb103-3" data-line-number="3">varsSelected &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">which</span>(lassoImportance<span class="op">$</span>Overall<span class="op">!=</span><span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb103-4" data-line-number="4">varsNotSelected &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">which</span>(lassoImportance<span class="op">$</span>Overall<span class="op">==</span><span class="dv">0</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" data-line-number="1"><span class="kw">vip</span>(glm_ridge_mod, <span class="dt">num_features =</span> <span class="dv">20</span>, <span class="dt">geom =</span> <span class="st">&quot;point&quot;</span>, <span class="dt">aesthetics =</span> <span class="kw">list</span>(<span class="dt">color =</span> <span class="st">&quot;Blue&quot;</span>))<span class="op">+</span><span class="st"> </span><span class="kw">theme_light</span>()<span class="op">+</span><span class="kw">ggtitle</span>(<span class="st">&quot;Top 20 Features Ordered by Importance Ridge Model&quot;</span>)</a></code></pre></div>
+<p><img src="HousePrices_Project1_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" data-line-number="1"><span class="kw">vip</span>(glm_lasso_mod, <span class="dt">num_features =</span> <span class="dv">20</span>, <span class="dt">geom =</span> <span class="st">&quot;point&quot;</span>,<span class="dt">aesthetics =</span> <span class="kw">list</span>(<span class="dt">color =</span> <span class="st">&quot;Blue&quot;</span>))<span class="op">+</span><span class="st"> </span><span class="kw">theme_light</span>()<span class="op">+</span><span class="kw">ggtitle</span>(<span class="st">&quot;Top 20 Features Ordered by Importance Lasso Model&quot;</span>)</a></code></pre></div>
+<p><img src="HousePrices_Project1_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb106-1" data-line-number="1"><span class="kw">vip</span>(glm_net_mod, <span class="dt">num_features =</span> <span class="dv">20</span>, <span class="dt">geom =</span> <span class="st">&quot;point&quot;</span>,<span class="dt">aesthetics =</span> <span class="kw">list</span>(<span class="dt">color =</span> <span class="st">&quot;Blue&quot;</span>))<span class="op">+</span><span class="st"> </span><span class="kw">theme_light</span>()<span class="op">+</span><span class="kw">ggtitle</span>(<span class="st">&quot;Top 20 Features Ordered by Importance Elastic Net Model&quot;</span>)</a></code></pre></div>
+<p><img src="HousePrices_Project1_files/figure-html/unnamed-chunk-10-3.png" width="672" /></p>
+</div>
+<div id="training-xgboost-model-with-feature-selection" class="section level2">
+<h2><span class="header-section-number">4.6</span> Training XGBoost Model with Feature Selection</h2>
+<p>Next we will implement an advanced machine learning model with a gradient boosted tree model using the xgboost package <span class="citation">(Chen et al. 2021)</span>. First, we will do some feature selection using the Boruta algorithm from the Boruta package <span class="citation">(Kursa and Rudnicki 2010)</span>.</p>
+<p>The Boruta algorithm is a wrapper built around the random forest classification algorithm. It selects the important features with respect to the outcome variable.</p>
+<p><strong>Feature Selection</strong></p>
+<p>Boruta selected 65 attributes confirmed important, and 88 attributes confirmed unimportant. After the boruta feature selection, 88 features were removed, living the data-set with 75 columns, the selected features are listed in the next page.</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" data-line-number="1"><span class="co"># The Boruta algorithm for feature selection uses Random Forest</span></a>
+<a class="sourceLine" id="cb107-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">123</span>)        <span class="co"># to get same results</span></a>
+<a class="sourceLine" id="cb107-3" data-line-number="3">train_boruta &lt;-<span class="st"> </span><span class="kw">Boruta</span>(SalePrice<span class="op">~</span>., <span class="dt">data=</span>train_<span class="dv">1</span>, <span class="dt">doTrace=</span><span class="dv">2</span>, <span class="dt">maxRuns=</span><span class="dv">125</span>)</a>
+<a class="sourceLine" id="cb107-4" data-line-number="4"><span class="co"># printing the results </span></a>
+<a class="sourceLine" id="cb107-5" data-line-number="5"><span class="co">#print(train_boruta)</span></a></code></pre></div>
+<p><strong>Selected Features:</strong></p>
+<pre><code>##  [1] &quot;MSSubClass&quot;            &quot;LotFrontage&quot;           &quot;LotArea&quot;              
+##  [4] &quot;OverallQual&quot;           &quot;OverallCond&quot;           &quot;MasVnrArea&quot;           
+##  [7] &quot;ExterQual&quot;             &quot;BsmtExposure&quot;          &quot;BsmtUnfSF&quot;            
+## [10] &quot;TotalBsmtSF&quot;           &quot;HeatingQC&quot;             &quot;CentralAir&quot;           
+## [13] &quot;Electrical&quot;            &quot;GrLivArea&quot;             &quot;BedroomAbvGr&quot;         
+## [16] &quot;TotRmsAbvGrd&quot;          &quot;Functional&quot;            &quot;Fireplaces&quot;           
+## [19] &quot;FireplaceQu&quot;           &quot;GarageFinish&quot;          &quot;GarageCars&quot;           
+## [22] &quot;PavedDrive&quot;            &quot;WoodDeckSF&quot;            &quot;NewBuild&quot;             
+## [25] &quot;BSmtFinSFComb&quot;         &quot;TotalArea&quot;             &quot;TotalBaths&quot;           
+## [28] &quot;PorchSF&quot;               &quot;Neigh_Cat&quot;             &quot;AgeCat&quot;               
+## [31] &quot;RemodelFromCat&quot;        &quot;GarageScore&quot;           &quot;OverallScore&quot;         
+## [34] &quot;ExterScore&quot;            &quot;KitchenScore&quot;          &quot;GarageGrade&quot;          
+## [37] &quot;MSSubClass.1&quot;          &quot;MSZoning.FV&quot;           &quot;MSZoning.RL&quot;          
+## [40] &quot;MSZoning.RM&quot;           &quot;LotShape.Reg&quot;          &quot;LandContour.Lvl&quot;      
+## [43] &quot;LotConfig.CulDSac&quot;     &quot;BldgType.Duplex&quot;       &quot;BldgType.Twnhs&quot;       
+## [46] &quot;BldgType.TwnhsE&quot;       &quot;HouseStyle.1Story&quot;     &quot;HouseStyle.2Story&quot;    
+## [49] &quot;HouseStyle.SLvl&quot;       &quot;RoofStyle.Gable&quot;       &quot;RoofStyle.Hip&quot;        
+## [52] &quot;Exterior1st.CemntBd&quot;   &quot;Exterior1st.HdBoard&quot;   &quot;Exterior1st.VinylSd&quot;  
+## [55] &quot;Exterior2nd.CmentBd&quot;   &quot;Exterior2nd.MetalSd&quot;   &quot;Exterior2nd.Plywood&quot;  
+## [58] &quot;Exterior2nd.VinylSd&quot;   &quot;MasVnrType.BrkFace&quot;    &quot;MasVnrType.None&quot;      
+## [61] &quot;MasVnrType.Stone&quot;      &quot;Foundation.CBlock&quot;     &quot;Foundation.PConc&quot;     
+## [64] &quot;GarageType.Attchd&quot;     &quot;GarageType.BuiltIn&quot;    &quot;GarageType.Detchd&quot;    
+## [67] &quot;GarageType.None&quot;       &quot;SaleType.New&quot;          &quot;SaleType.WD&quot;          
+## [70] &quot;SaleCondition.Normal&quot;  &quot;SaleCondition.Partial&quot;</code></pre>
+<p>This plot shows the selected features in green, and the rejected features in red. The yellow, represent tentative attributes.</p>
+<p><img src="HousePrices_Project1_files/figure-html/BorutaSelection-1.png" width="672" /></p>
+<div id="training-the-xgboost-model" class="section level3">
+<h3><span class="header-section-number">4.6.1</span> Training the XGboost Model</h3>
+<p>The XGBoost model has several sets of parameters that can be customized: we focused on only two: general parameters, which relate to which booster is used, in this case we selected a ‘gbtree’; and the second parameters we tuned were the booster parameters. For the booster parameter, we used 5-fold cross validation to determine the optimal number of rounds.
+For the rest of the booster parameters, the best way to find the optimal parameters is to set a search grid, however this was taking too long (more than an hour to run). So, instead of using this approach I started with the default parameters, and manually changed the min_child_weight(default=1), and eta(default = 0.3), about three times, until I got a better RMSE on the training data. This is not the ideal way to do it, but I am not sure my computer was ever going to get through it.</p>
+<p>The final parameters chosen, which resulted in training RMSE:0.125043, were:</p>
+
+<div id="tuning-paraments" class="section level4">
+<h4><span class="header-section-number">4.6.1.1</span> Tuning Paraments</h4>
+<pre><code>## [1]  train-rmse:10.953498+0.002662   test-rmse:10.953500+0.011326 
+## Multiple eval metrics are present. Will use test_rmse for early stopping.
+## Will train until test_rmse hasn&#39;t improved in 10 rounds.
+## 
+## [2]  train-rmse:10.407027+0.002537   test-rmse:10.407029+0.011470 
+## [3]  train-rmse:9.887894+0.002419    test-rmse:9.887896+0.011608 
+## [4]  train-rmse:9.394737+0.002307    test-rmse:9.394738+0.011742 
+## [5]  train-rmse:8.926258+0.002201    test-rmse:8.926259+0.011869 
+## [6]  train-rmse:8.481207+0.002096    test-rmse:8.481372+0.012111 
+## [7]  train-rmse:8.058389+0.001994    test-rmse:8.058555+0.011639 
+## [8]  train-rmse:7.656692+0.001894    test-rmse:7.656859+0.011849 
+## [9]  train-rmse:7.275063+0.001801    test-rmse:7.275431+0.011417 
+## [10] train-rmse:6.912498+0.001711    test-rmse:6.912623+0.010976 
+## [11] train-rmse:6.568046+0.001629    test-rmse:6.568478+0.010851 
+## [12] train-rmse:6.240804+0.001547    test-rmse:6.240951+0.010706 
+## [13] train-rmse:5.929916+0.001471    test-rmse:5.930394+0.010632 
+## [14] train-rmse:5.634563+0.001398    test-rmse:5.634505+0.010604 
+## [15] train-rmse:5.353969+0.001329    test-rmse:5.354346+0.010289 
+## [16] train-rmse:5.087400+0.001263    test-rmse:5.087583+0.010231 
+## [17] train-rmse:4.834158+0.001198    test-rmse:4.834051+0.010390 
+## [18] train-rmse:4.593575+0.001139    test-rmse:4.593887+0.009861 
+## [19] train-rmse:4.365023+0.001083    test-rmse:4.365229+0.009583 
+## [20] train-rmse:4.147903+0.001030    test-rmse:4.147886+0.009588 
+## [21] train-rmse:3.941640+0.000976    test-rmse:3.941590+0.009583 
+## [22] train-rmse:3.745685+0.000930    test-rmse:3.745705+0.009580 
+## [23] train-rmse:3.559526+0.000880    test-rmse:3.559161+0.009203 
+## [24] train-rmse:3.382670+0.000831    test-rmse:3.382171+0.009355 
+## [25] train-rmse:3.214658+0.000789    test-rmse:3.214105+0.009070 
+## [26] train-rmse:3.055035+0.000754    test-rmse:3.054762+0.009103 
+## [27] train-rmse:2.903400+0.000711    test-rmse:2.903178+0.009339 
+## [28] train-rmse:2.759342+0.000675    test-rmse:2.759266+0.009237 
+## [29] train-rmse:2.622475+0.000636    test-rmse:2.622701+0.009289 
+## [30] train-rmse:2.492446+0.000593    test-rmse:2.492574+0.009357 
+## [31] train-rmse:2.368930+0.000565    test-rmse:2.368912+0.009414 
+## [32] train-rmse:2.251575+0.000549    test-rmse:2.251385+0.009793 
+## [33] train-rmse:2.140104+0.000520    test-rmse:2.139894+0.009558 
+## [34] train-rmse:2.034207+0.000489    test-rmse:2.034325+0.009486 
+## [35] train-rmse:1.933595+0.000466    test-rmse:1.933504+0.009618 
+## [36] train-rmse:1.838021+0.000442    test-rmse:1.837935+0.009536 
+## [37] train-rmse:1.747226+0.000427    test-rmse:1.747222+0.009566 
+## [38] train-rmse:1.660984+0.000395    test-rmse:1.661250+0.009462 
+## [39] train-rmse:1.579069+0.000377    test-rmse:1.579350+0.009699 
+## [40] train-rmse:1.501250+0.000364    test-rmse:1.501468+0.009740 
+## [41] train-rmse:1.427334+0.000348    test-rmse:1.427608+0.009724 
+## [42] train-rmse:1.357122+0.000329    test-rmse:1.357372+0.009754 
+## [43] train-rmse:1.290431+0.000311    test-rmse:1.290948+0.009706 
+## [44] train-rmse:1.227095+0.000305    test-rmse:1.227542+0.009601 
+## [45] train-rmse:1.166930+0.000309    test-rmse:1.167430+0.009664 
+## [46] train-rmse:1.109773+0.000313    test-rmse:1.110418+0.009641 
+## [47] train-rmse:1.055510+0.000312    test-rmse:1.056204+0.009705 
+## [48] train-rmse:1.003953+0.000291    test-rmse:1.004609+0.009401 
+## [49] train-rmse:0.954989+0.000305    test-rmse:0.955836+0.009388 
+## [50] train-rmse:0.908505+0.000308    test-rmse:0.909544+0.009386 
+## [51] train-rmse:0.864328+0.000302    test-rmse:0.865553+0.009170 
+## [52] train-rmse:0.822398+0.000306    test-rmse:0.823729+0.009069 
+## [53] train-rmse:0.782591+0.000309    test-rmse:0.784122+0.008928 
+## [54] train-rmse:0.744773+0.000315    test-rmse:0.746417+0.008772 
+## [55] train-rmse:0.708864+0.000335    test-rmse:0.710733+0.008631 
+## [56] train-rmse:0.674771+0.000340    test-rmse:0.676792+0.008518 
+## [57] train-rmse:0.642397+0.000350    test-rmse:0.644716+0.008424 
+## [58] train-rmse:0.611671+0.000363    test-rmse:0.614350+0.008328 
+## [59] train-rmse:0.582489+0.000379    test-rmse:0.585387+0.008089 
+## [60] train-rmse:0.554802+0.000405    test-rmse:0.557844+0.007957 
+## [61] train-rmse:0.528515+0.000438    test-rmse:0.531768+0.007987 
+## [62] train-rmse:0.503541+0.000451    test-rmse:0.507436+0.007835 
+## [63] train-rmse:0.479847+0.000440    test-rmse:0.484284+0.007884 
+## [64] train-rmse:0.457369+0.000446    test-rmse:0.462039+0.007809 
+## [65] train-rmse:0.436032+0.000469    test-rmse:0.441179+0.007759 
+## [66] train-rmse:0.415778+0.000474    test-rmse:0.421474+0.007806 
+## [67] train-rmse:0.396563+0.000478    test-rmse:0.402679+0.007802 
+## [68] train-rmse:0.378304+0.000493    test-rmse:0.384998+0.007727 
+## [69] train-rmse:0.361010+0.000509    test-rmse:0.368250+0.007626 
+## [70] train-rmse:0.344615+0.000519    test-rmse:0.352482+0.007567 
+## [71] train-rmse:0.329046+0.000538    test-rmse:0.337491+0.007509 
+## [72] train-rmse:0.314294+0.000534    test-rmse:0.323483+0.007389 
+## [73] train-rmse:0.300291+0.000554    test-rmse:0.310218+0.007333 
+## [74] train-rmse:0.287039+0.000564    test-rmse:0.297528+0.007181 
+## [75] train-rmse:0.274457+0.000550    test-rmse:0.285703+0.007074 
+## [76] train-rmse:0.262548+0.000551    test-rmse:0.274595+0.007097 
+## [77] train-rmse:0.251266+0.000602    test-rmse:0.264129+0.007034 
+## [78] train-rmse:0.240584+0.000613    test-rmse:0.254369+0.007087 
+## [79] train-rmse:0.230480+0.000642    test-rmse:0.245206+0.007038 
+## [80] train-rmse:0.220903+0.000670    test-rmse:0.236374+0.007032 
+## [81] train-rmse:0.211861+0.000701    test-rmse:0.228288+0.006980 
+## [82] train-rmse:0.203254+0.000708    test-rmse:0.220612+0.006813 
+## [83] train-rmse:0.195151+0.000718    test-rmse:0.213478+0.006736 
+## [84] train-rmse:0.187469+0.000705    test-rmse:0.206846+0.006694 
+## [85] train-rmse:0.180213+0.000708    test-rmse:0.200539+0.006668 
+## [86] train-rmse:0.173364+0.000730    test-rmse:0.194680+0.006611 
+## [87] train-rmse:0.166874+0.000763    test-rmse:0.189286+0.006525 
+## [88] train-rmse:0.160735+0.000805    test-rmse:0.184193+0.006434 
+## [89] train-rmse:0.154921+0.000829    test-rmse:0.179433+0.006418 
+## [90] train-rmse:0.149479+0.000854    test-rmse:0.175101+0.006402 
+## [91] train-rmse:0.144336+0.000856    test-rmse:0.171043+0.006303 
+## [92] train-rmse:0.139483+0.000921    test-rmse:0.167266+0.006210 
+## [93] train-rmse:0.134862+0.000956    test-rmse:0.163805+0.006214 
+## [94] train-rmse:0.130473+0.000948    test-rmse:0.160556+0.006201 
+## [95] train-rmse:0.126380+0.000990    test-rmse:0.157546+0.006104 
+## [96] train-rmse:0.122531+0.001017    test-rmse:0.154845+0.005983 
+## [97] train-rmse:0.118931+0.001034    test-rmse:0.152217+0.005826 
+## [98] train-rmse:0.115578+0.001052    test-rmse:0.149739+0.005760 
+## [99] train-rmse:0.112366+0.001043    test-rmse:0.147436+0.005612 
+## [100]    train-rmse:0.109314+0.001079    test-rmse:0.145427+0.005504 
+## [101]    train-rmse:0.106473+0.001115    test-rmse:0.143636+0.005468 
+## [102]    train-rmse:0.103867+0.001089    test-rmse:0.141874+0.005426 
+## [103]    train-rmse:0.101354+0.001069    test-rmse:0.140297+0.005344 
+## [104]    train-rmse:0.099028+0.001117    test-rmse:0.138833+0.005311 
+## [105]    train-rmse:0.096839+0.001098    test-rmse:0.137570+0.005304 
+## [106]    train-rmse:0.094805+0.001054    test-rmse:0.136295+0.005254 
+## [107]    train-rmse:0.092885+0.001042    test-rmse:0.135233+0.005278 
+## [108]    train-rmse:0.091067+0.001043    test-rmse:0.134260+0.005238 
+## [109]    train-rmse:0.089406+0.001055    test-rmse:0.133389+0.005237 
+## [110]    train-rmse:0.087738+0.001034    test-rmse:0.132444+0.005219 
+## [111]    train-rmse:0.086227+0.001034    test-rmse:0.131624+0.005182 
+## [112]    train-rmse:0.084791+0.001035    test-rmse:0.130840+0.005181 
+## [113]    train-rmse:0.083434+0.000984    test-rmse:0.130097+0.005214 
+## [114]    train-rmse:0.082178+0.000965    test-rmse:0.129512+0.005172 
+## [115]    train-rmse:0.081006+0.000992    test-rmse:0.128944+0.005153 
+## [116]    train-rmse:0.079896+0.000981    test-rmse:0.128416+0.005154 
+## [117]    train-rmse:0.078860+0.000970    test-rmse:0.127933+0.005181 
+## [118]    train-rmse:0.077855+0.000998    test-rmse:0.127476+0.005202 
+## [119]    train-rmse:0.076890+0.000992    test-rmse:0.127017+0.005212 
+## [120]    train-rmse:0.075970+0.000990    test-rmse:0.126728+0.005171 
+## [121]    train-rmse:0.075147+0.001004    test-rmse:0.126367+0.005158 
+## [122]    train-rmse:0.074300+0.001009    test-rmse:0.126011+0.005164 
+## [123]    train-rmse:0.073515+0.000997    test-rmse:0.125725+0.005244 
+## [124]    train-rmse:0.072737+0.000951    test-rmse:0.125451+0.005214 
+## [125]    train-rmse:0.072030+0.000995    test-rmse:0.125222+0.005238 
+## [126]    train-rmse:0.071333+0.001023    test-rmse:0.124928+0.005211 
+## [127]    train-rmse:0.070672+0.001045    test-rmse:0.124678+0.005223 
+## [128]    train-rmse:0.070039+0.001048    test-rmse:0.124509+0.005232 
+## [129]    train-rmse:0.069458+0.001091    test-rmse:0.124378+0.005313 
+## [130]    train-rmse:0.068888+0.001182    test-rmse:0.124222+0.005365 
+## [131]    train-rmse:0.068351+0.001155    test-rmse:0.124061+0.005331 
+## [132]    train-rmse:0.067799+0.001137    test-rmse:0.123878+0.005335 
+## [133]    train-rmse:0.067282+0.001070    test-rmse:0.123718+0.005393 
+## [134]    train-rmse:0.066808+0.001134    test-rmse:0.123649+0.005443 
+## [135]    train-rmse:0.066353+0.001011    test-rmse:0.123494+0.005567 
+## [136]    train-rmse:0.065917+0.000970    test-rmse:0.123389+0.005598 
+## [137]    train-rmse:0.065432+0.000881    test-rmse:0.123264+0.005637 
+## [138]    train-rmse:0.064958+0.000864    test-rmse:0.123180+0.005666 
+## [139]    train-rmse:0.064510+0.000941    test-rmse:0.123115+0.005711 
+## [140]    train-rmse:0.064169+0.000919    test-rmse:0.122997+0.005730 
+## [141]    train-rmse:0.063687+0.000850    test-rmse:0.122962+0.005700 
+## [142]    train-rmse:0.063311+0.000782    test-rmse:0.122891+0.005732 
+## [143]    train-rmse:0.062984+0.000768    test-rmse:0.122841+0.005741 
+## [144]    train-rmse:0.062638+0.000769    test-rmse:0.122715+0.005741 
+## [145]    train-rmse:0.062291+0.000781    test-rmse:0.122663+0.005797 
+## [146]    train-rmse:0.061941+0.000751    test-rmse:0.122614+0.005782 
+## [147]    train-rmse:0.061664+0.000754    test-rmse:0.122546+0.005762 
+## [148]    train-rmse:0.061290+0.000729    test-rmse:0.122474+0.005795 
+## [149]    train-rmse:0.061028+0.000710    test-rmse:0.122407+0.005812 
+## [150]    train-rmse:0.060742+0.000670    test-rmse:0.122370+0.005849 
+## [151]    train-rmse:0.060512+0.000701    test-rmse:0.122330+0.005841 
+## [152]    train-rmse:0.060188+0.000638    test-rmse:0.122257+0.005904 
+## [153]    train-rmse:0.059867+0.000700    test-rmse:0.122229+0.005944 
+## [154]    train-rmse:0.059528+0.000718    test-rmse:0.122175+0.005927 
+## [155]    train-rmse:0.059106+0.000696    test-rmse:0.122148+0.005902 
+## [156]    train-rmse:0.058870+0.000666    test-rmse:0.122145+0.005894 
+## [157]    train-rmse:0.058633+0.000672    test-rmse:0.122058+0.005910 
+## [158]    train-rmse:0.058340+0.000707    test-rmse:0.122022+0.005916 
+## [159]    train-rmse:0.058092+0.000754    test-rmse:0.121986+0.005919 
+## [160]    train-rmse:0.057842+0.000682    test-rmse:0.121972+0.005934 
+## [161]    train-rmse:0.057591+0.000715    test-rmse:0.121918+0.005924 
+## [162]    train-rmse:0.057254+0.000742    test-rmse:0.121823+0.005945 
+## [163]    train-rmse:0.057007+0.000659    test-rmse:0.121833+0.005970 
+## [164]    train-rmse:0.056737+0.000718    test-rmse:0.121818+0.005995 
+## [165]    train-rmse:0.056405+0.000724    test-rmse:0.121707+0.006046 
+## [166]    train-rmse:0.056100+0.000813    test-rmse:0.121631+0.006005 
+## [167]    train-rmse:0.055787+0.000865    test-rmse:0.121579+0.006069 
+## [168]    train-rmse:0.055573+0.000843    test-rmse:0.121614+0.006113 
+## [169]    train-rmse:0.055377+0.000794    test-rmse:0.121600+0.006153 
+## [170]    train-rmse:0.055147+0.000820    test-rmse:0.121558+0.006166 
+## [171]    train-rmse:0.054912+0.000762    test-rmse:0.121549+0.006197 
+## [172]    train-rmse:0.054658+0.000816    test-rmse:0.121519+0.006198 
+## [173]    train-rmse:0.054451+0.000845    test-rmse:0.121506+0.006247 
+## [174]    train-rmse:0.054259+0.000876    test-rmse:0.121521+0.006246 
+## [175]    train-rmse:0.054025+0.000891    test-rmse:0.121488+0.006204 
+## [176]    train-rmse:0.053732+0.000844    test-rmse:0.121478+0.006227 
+## [177]    train-rmse:0.053487+0.000771    test-rmse:0.121460+0.006240 
+## [178]    train-rmse:0.053300+0.000762    test-rmse:0.121454+0.006288 
+## [179]    train-rmse:0.053150+0.000765    test-rmse:0.121432+0.006316 
+## [180]    train-rmse:0.052921+0.000714    test-rmse:0.121413+0.006341 
+## [181]    train-rmse:0.052697+0.000619    test-rmse:0.121376+0.006351 
+## [182]    train-rmse:0.052447+0.000563    test-rmse:0.121362+0.006369 
+## [183]    train-rmse:0.052269+0.000624    test-rmse:0.121342+0.006382 
+## [184]    train-rmse:0.052119+0.000592    test-rmse:0.121364+0.006386 
+## [185]    train-rmse:0.051854+0.000603    test-rmse:0.121337+0.006362 
+## [186]    train-rmse:0.051673+0.000630    test-rmse:0.121329+0.006389 
+## [187]    train-rmse:0.051421+0.000571    test-rmse:0.121329+0.006423 
+## [188]    train-rmse:0.051206+0.000631    test-rmse:0.121326+0.006457 
+## [189]    train-rmse:0.050970+0.000664    test-rmse:0.121316+0.006466 
+## [190]    train-rmse:0.050775+0.000594    test-rmse:0.121289+0.006481 
+## [191]    train-rmse:0.050630+0.000593    test-rmse:0.121284+0.006470 
+## [192]    train-rmse:0.050451+0.000645    test-rmse:0.121280+0.006462 
+## [193]    train-rmse:0.050239+0.000732    test-rmse:0.121299+0.006498 
+## [194]    train-rmse:0.050052+0.000774    test-rmse:0.121256+0.006506 
+## [195]    train-rmse:0.049875+0.000744    test-rmse:0.121239+0.006504 
+## [196]    train-rmse:0.049656+0.000824    test-rmse:0.121238+0.006508 
+## [197]    train-rmse:0.049428+0.000871    test-rmse:0.121213+0.006518 
+## [198]    train-rmse:0.049213+0.000905    test-rmse:0.121228+0.006514 
+## [199]    train-rmse:0.048989+0.000911    test-rmse:0.121195+0.006489 
+## [200]    train-rmse:0.048837+0.000880    test-rmse:0.121204+0.006492 
+## [201]    train-rmse:0.048618+0.000821    test-rmse:0.121196+0.006510 
+## [202]    train-rmse:0.048401+0.000904    test-rmse:0.121195+0.006510 
+## [203]    train-rmse:0.048241+0.000913    test-rmse:0.121195+0.006515 
+## [204]    train-rmse:0.048009+0.000934    test-rmse:0.121202+0.006520 
+## [205]    train-rmse:0.047814+0.000952    test-rmse:0.121196+0.006518 
+## [206]    train-rmse:0.047621+0.000924    test-rmse:0.121186+0.006538 
+## [207]    train-rmse:0.047467+0.000987    test-rmse:0.121220+0.006555 
+## [208]    train-rmse:0.047159+0.000939    test-rmse:0.121216+0.006536 
+## [209]    train-rmse:0.047003+0.000986    test-rmse:0.121194+0.006515 
+## [210]    train-rmse:0.046851+0.001006    test-rmse:0.121211+0.006532 
+## [211]    train-rmse:0.046560+0.001004    test-rmse:0.121186+0.006565 
+## [212]    train-rmse:0.046400+0.001020    test-rmse:0.121196+0.006605 
+## [213]    train-rmse:0.046185+0.001069    test-rmse:0.121201+0.006624 
+## [214]    train-rmse:0.045946+0.000943    test-rmse:0.121202+0.006649 
+## [215]    train-rmse:0.045717+0.000941    test-rmse:0.121172+0.006646 
+## [216]    train-rmse:0.045559+0.000923    test-rmse:0.121201+0.006673 
+## [217]    train-rmse:0.045425+0.000946    test-rmse:0.121198+0.006683 
+## [218]    train-rmse:0.045215+0.001012    test-rmse:0.121201+0.006679 
+## [219]    train-rmse:0.045004+0.001003    test-rmse:0.121209+0.006691 
+## [220]    train-rmse:0.044800+0.001056    test-rmse:0.121243+0.006718 
+## [221]    train-rmse:0.044626+0.001107    test-rmse:0.121258+0.006728 
+## [222]    train-rmse:0.044475+0.001128    test-rmse:0.121241+0.006707 
+## [223]    train-rmse:0.044302+0.001122    test-rmse:0.121251+0.006731 
+## [224]    train-rmse:0.044079+0.001115    test-rmse:0.121248+0.006746 
+## [225]    train-rmse:0.043937+0.001128    test-rmse:0.121237+0.006755 
+## Stopping. Best iteration:
+## [215]    train-rmse:0.045717+0.000941    test-rmse:0.121172+0.006646</code></pre>
+<pre><code>## [1] 215</code></pre>
+<pre><code>## The XGB model includes 71 features, and  the optimal number of rounds: 215 was selected based on  RMSE of 0.121172</code></pre>
+<pre><code>## ##### xgb.Booster
+## raw: 606.1 Kb 
+## call:
+##   xgb.train(params = default_param_sf, data = dtrain_fs, nrounds = xgbcv_fs$best_iteration)
+## params (as set within xgb.train):
+##   booster = &quot;gbtree&quot;, eta = &quot;0.05&quot;, gamma = &quot;0&quot;, max_depth = &quot;6&quot;, min_child_weight = &quot;4&quot;, subsample = &quot;1&quot;, colsample_bytree = &quot;1&quot;, validate_parameters = &quot;TRUE&quot;
+## xgb.attributes:
+##   niter
+## callbacks:
+##   cb.print.evaluation(period = print_every_n)
+## # of features: 71 
+## niter: 215
+## nfeatures : 71</code></pre>
+</div>
+</div>
+</div>
+<div id="evaluating-xgboost-models-performance" class="section level2">
+<h2><span class="header-section-number">4.7</span> Evaluating XGBoost Model’s Performance</h2>
+<p>The XGB model performs much better (with R-squared=0.9831584) than the best performing regularized regression model: Lasso (R-squared=0.9226179). So, 98% of the variation in the in SalePrice is explained by the XGB model vs only 92% by the Lasso model (similarly with the Ridge and Elastic Net models).</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Models
+</th>
+<th style="text-align:left;">
+Parameters
+</th>
+<th style="text-align:right;">
+Features
+</th>
+<th style="text-align:right;">
+Corr
+</th>
+<th style="text-align:right;">
+Rsquared
+</th>
+<th style="text-align:right;">
+RMSE
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Ridge
+</td>
+<td style="text-align:left;">
+0.032464278081627
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0.9604194
+</td>
+<td style="text-align:right;">
+0.9222852
+</td>
+<td style="text-align:right;">
+0.1103787
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lasso
+</td>
+<td style="text-align:left;">
+0.00122225922578168
+</td>
+<td style="text-align:right;">
+51
+</td>
+<td style="text-align:right;">
+0.9605517
+</td>
+<td style="text-align:right;">
+0.9226179
+</td>
+<td style="text-align:right;">
+0.1101422
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Elastic Net
+</td>
+<td style="text-align:left;">
+0.0111367708494731
+</td>
+<td style="text-align:right;">
+55
+</td>
+<td style="text-align:right;">
+0.9604168
+</td>
+<td style="text-align:right;">
+0.9223046
+</td>
+<td style="text-align:right;">
+0.1103650
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+XGBoost
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+71
+</td>
+<td style="text-align:right;">
+0.9916635
+</td>
+<td style="text-align:right;">
+0.9831584
+</td>
+<td style="text-align:right;">
+0.0513837
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="data-pre-processing.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="prediction.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+},
+"search": false
+});
+});
+</script>
+
+</body>
+
+</html>

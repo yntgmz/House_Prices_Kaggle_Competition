@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>6 Validation | House Prices: Advanced Regression Techniques</title>
+  <meta name="description" content="6 Validation | House Prices: Advanced Regression Techniques" />
+  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="6 Validation | House Prices: Advanced Regression Techniques" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="https://github.com/yntgmz/House_Prices_Kaggle_Competition" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="6 Validation | House Prices: Advanced Regression Techniques" />
+  
+  
+  
+
+<meta name="author" content="Yanet Gomez" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="prediction.html"/>
+<link rel="next" href="conclusion.html"/>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
+<link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#origin"><i class="fa fa-check"></i><b>1.1</b> Origin</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#starting-point"><i class="fa fa-check"></i><b>1.2</b> Starting Point</a></li>
+<li class="chapter" data-level="1.3" data-path="introduction.html"><a href="introduction.html#technical-skills"><i class="fa fa-check"></i><b>1.3</b> Technical Skills</a></li>
+<li class="chapter" data-level="1.4" data-path="introduction.html"><a href="introduction.html#problem-definition"><i class="fa fa-check"></i><b>1.4</b> Problem Definition</a></li>
+<li class="chapter" data-level="1.5" data-path="introduction.html"><a href="introduction.html#data-description"><i class="fa fa-check"></i><b>1.5</b> Data Description</a></li>
+<li class="chapter" data-level="1.6" data-path="introduction.html"><a href="introduction.html#data-analytics-workflow"><i class="fa fa-check"></i><b>1.6</b> Data Analytics Workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data.html"><a href="data.html"><i class="fa fa-check"></i><b>2</b> Data</a></li>
+<li class="chapter" data-level="3" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>3</b> Data Pre-processing</a><ul>
+<li class="chapter" data-level="3.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#identifying-and-correcting-missing-values"><i class="fa fa-check"></i><b>3.1</b> Identifying and Correcting Missing Values</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#detect-missing-values"><i class="fa fa-check"></i><b>3.1.1</b> Detect Missing Values</a></li>
+<li class="chapter" data-level="3.1.2" data-path="data-pre-processing.html"><a href="data-pre-processing.html#dealing-with-missing-values"><i class="fa fa-check"></i><b>3.1.2</b> Dealing With Missing Values</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="data-pre-processing.html"><a href="data-pre-processing.html#correct-data-types"><i class="fa fa-check"></i><b>3.2</b> Correct Data Types</a></li>
+<li class="chapter" data-level="3.3" data-path="data-pre-processing.html"><a href="data-pre-processing.html#feature-transformation"><i class="fa fa-check"></i><b>3.3</b> Feature Transformation</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#visualizing-the-distribution-and-spread-of-target-feature-salesprice"><i class="fa fa-check"></i><b>3.3.1</b> Visualizing the Distribution and Spread of Target Feature : SalesPrice</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="data-pre-processing.html"><a href="data-pre-processing.html#dimensionality-and-numerosity-reduction"><i class="fa fa-check"></i><b>3.4</b> Dimensionality and Numerosity Reduction</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#outliers"><i class="fa fa-check"></i><b>3.4.1</b> Outliers</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="modeling.html"><a href="modeling.html"><i class="fa fa-check"></i><b>4</b> Modeling</a><ul>
+<li class="chapter" data-level="4.1" data-path="modeling.html"><a href="modeling.html#multivariate-linear-regression-model"><i class="fa fa-check"></i><b>4.1</b> Multivariate Linear Regression Model</a></li>
+<li class="chapter" data-level="4.2" data-path="modeling.html"><a href="modeling.html#model-selection"><i class="fa fa-check"></i><b>4.2</b> Model Selection</a></li>
+<li class="chapter" data-level="4.3" data-path="modeling.html"><a href="modeling.html#regularized-regression-models"><i class="fa fa-check"></i><b>4.3</b> Regularized Regression Models</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="modeling.html"><a href="modeling.html#identify-the-optimal-lambda-parameter"><i class="fa fa-check"></i><b>4.3.1</b> Identify the Optimal Lambda Parameter</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="modeling.html"><a href="modeling.html#training-the-regularized-regression-models"><i class="fa fa-check"></i><b>4.4</b> Training the Regularized Regression Models</a></li>
+<li class="chapter" data-level="4.5" data-path="modeling.html"><a href="modeling.html#evaluating-the-regularized-regression-models-performance"><i class="fa fa-check"></i><b>4.5</b> Evaluating the Regularized Regression Models’ Performance</a></li>
+<li class="chapter" data-level="4.6" data-path="modeling.html"><a href="modeling.html#training-xgboost-model-with-feature-selection"><i class="fa fa-check"></i><b>4.6</b> Training XGBoost Model with Feature Selection</a><ul>
+<li class="chapter" data-level="4.6.1" data-path="modeling.html"><a href="modeling.html#training-the-xgboost-model"><i class="fa fa-check"></i><b>4.6.1</b> Training the XGboost Model</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="modeling.html"><a href="modeling.html#evaluating-xgboost-models-performance"><i class="fa fa-check"></i><b>4.7</b> Evaluating XGBoost Model’s Performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="prediction.html"><a href="prediction.html"><i class="fa fa-check"></i><b>5</b> Prediction</a><ul>
+<li class="chapter" data-level="5.1" data-path="prediction.html"><a href="prediction.html#prediction-with-regularized-regression-models"><i class="fa fa-check"></i><b>5.1</b> Prediction with Regularized Regression Models</a></li>
+<li class="chapter" data-level="5.2" data-path="prediction.html"><a href="prediction.html#prediction-with-xgboost-model"><i class="fa fa-check"></i><b>5.2</b> Prediction with XGboost Model</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="validation.html"><a href="validation.html"><i class="fa fa-check"></i><b>6</b> Validation</a><ul>
+<li class="chapter" data-level="6.0.1" data-path="validation.html"><a href="validation.html#kaggle-submission"><i class="fa fa-check"></i><b>6.0.1</b> Kaggle Submission</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a><ul>
+<li class="chapter" data-level="7.1" data-path="conclusion.html"><a href="conclusion.html#answer-to-research-questions"><i class="fa fa-check"></i><b>7.1</b> Answer to Research Questions</a></li>
+<li class="chapter" data-level="7.2" data-path="conclusion.html"><a href="conclusion.html#future-work"><i class="fa fa-check"></i><b>7.2</b> Future Work</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="bibliography.html"><a href="bibliography.html"><i class="fa fa-check"></i>Bibliography</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">House Prices: Advanced Regression Techniques</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="validation" class="section level1">
+<h1><span class="header-section-number">6</span> Validation</h1>
+<div id="kaggle-submission" class="section level3">
+<h3><span class="header-section-number">6.0.1</span> Kaggle Submission</h3>
+<p>The table below shows how the models performed in the final prediction. The best performing model in the Kaggle prediction is the XGboost model, after feature selection was performed. The regularization models performed slightly better on training than on Kaggle, with RMSE or around .12 on training and .13 on Kaggle final prediction. This indicates that the models are still slightly over-fitted. The XGB model, which is the best model based on the prediction RMSE performed worse on the Kaggle prediction with RMSE of .12758 than it did on training. This model is probably over-fitted, and fine tuning the model’s parameters with an expanded grid search to find the optimal tuning parameters would probably result in a better model.</p>
+<p>Below are the final models submitted to Kaggle.com, and the corresponding Kaggle score.</p>
+<p><strong>Final Summary Table</strong></p>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1">borutafeatures=<span class="kw">length</span>(trainb_selfeat)</a>
+<a class="sourceLine" id="cb118-2" data-line-number="2">models&lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Ridge&quot;</span>, <span class="st">&quot;Lasso&quot;</span>, <span class="st">&quot;Elastic Net&quot;</span>, <span class="st">&quot;XGBoost&quot;</span>)</a>
+<a class="sourceLine" id="cb118-3" data-line-number="3">tunning_parameters&lt;-<span class="kw">c</span>(penalty_ridge, penalty_lasso, penalty_net, <span class="st">&quot; &quot;</span>)</a>
+<a class="sourceLine" id="cb118-4" data-line-number="4">nfeatures&lt;-<span class="kw">c</span>(rfeatures, lfeatures, efeatures, borutafeatures)</a>
+<a class="sourceLine" id="cb118-5" data-line-number="5">R_Squared&lt;-<span class="kw">c</span>(ridge_R_squared, lasso_R_squared, net_R_squared, XGB_R_squared)</a>
+<a class="sourceLine" id="cb118-6" data-line-number="6">Cor&lt;-<span class="st"> </span><span class="kw">c</span>(ridge_corr, lasso_corr, net_corr, XGB_corr)</a>
+<a class="sourceLine" id="cb118-7" data-line-number="7">RMSE&lt;-<span class="kw">c</span>(ridge_RMSE, lasso_RMSE, net_RMSE, XGB_RMSE)</a>
+<a class="sourceLine" id="cb118-8" data-line-number="8">KaggleRMSE&lt;-<span class="kw">c</span>(<span class="fl">0.13163</span>, <span class="fl">0.12998</span>, <span class="fl">0.13061</span>, <span class="fl">0.12758</span> )</a>
+<a class="sourceLine" id="cb118-9" data-line-number="9"><span class="kw">kable</span>(<span class="kw">data.frame</span>(<span class="dt">Models=</span>models, <span class="dt">Features=</span>nfeatures,<span class="dt">Corr=</span>Cor,  <span class="dt">Rsquared=</span>R_Squared, <span class="dt">TrainingRMSE =</span> RMSE, <span class="dt">KaggleRMSE=</span>KaggleRMSE))</a></code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Models
+</th>
+<th style="text-align:right;">
+Features
+</th>
+<th style="text-align:right;">
+Corr
+</th>
+<th style="text-align:right;">
+Rsquared
+</th>
+<th style="text-align:right;">
+TrainingRMSE
+</th>
+<th style="text-align:right;">
+KaggleRMSE
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Ridge
+</td>
+<td style="text-align:right;">
+75
+</td>
+<td style="text-align:right;">
+0.9604194
+</td>
+<td style="text-align:right;">
+0.9222852
+</td>
+<td style="text-align:right;">
+0.1103787
+</td>
+<td style="text-align:right;">
+0.13163
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lasso
+</td>
+<td style="text-align:right;">
+51
+</td>
+<td style="text-align:right;">
+0.9605517
+</td>
+<td style="text-align:right;">
+0.9226179
+</td>
+<td style="text-align:right;">
+0.1101422
+</td>
+<td style="text-align:right;">
+0.12998
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Elastic Net
+</td>
+<td style="text-align:right;">
+55
+</td>
+<td style="text-align:right;">
+0.9604168
+</td>
+<td style="text-align:right;">
+0.9223046
+</td>
+<td style="text-align:right;">
+0.1103650
+</td>
+<td style="text-align:right;">
+0.13061
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+XGBoost
+</td>
+<td style="text-align:right;">
+71
+</td>
+<td style="text-align:right;">
+0.9916635
+</td>
+<td style="text-align:right;">
+0.9831584
+</td>
+<td style="text-align:right;">
+0.0513837
+</td>
+<td style="text-align:right;">
+0.12758
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="prediction.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="conclusion.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+},
+"search": false
+});
+});
+</script>
+
+</body>
+
+</html>
