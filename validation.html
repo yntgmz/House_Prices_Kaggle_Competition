@@ -13,7 +13,7 @@
   
   
   
-  <meta name="github-repo" content="https://github.com/yntgmz/House_Prices_Kaggle_Competition" />
+  <meta name="github-repo" content="https://github.com/yntgmz/House_Prices_Kaggle_Competition.git" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="6 Validation | House Prices: Advanced Regression Techniques" />
@@ -203,15 +203,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The table below shows how the models performed in the final prediction. The best performing model in the Kaggle prediction is the XGboost model, after feature selection was performed. The regularization models performed slightly better on training than on Kaggle, with RMSE or around .12 on training and .13 on Kaggle final prediction. This indicates that the models are still slightly over-fitted. The XGB model, which is the best model based on the prediction RMSE performed worse on the Kaggle prediction with RMSE of .12758 than it did on training. This model is probably over-fitted, and fine tuning the model’s parameters with an expanded grid search to find the optimal tuning parameters would probably result in a better model.</p>
 <p>Below are the final models submitted to Kaggle.com, and the corresponding Kaggle score.</p>
 <p><strong>Final Summary Table</strong></p>
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1">borutafeatures=<span class="kw">length</span>(trainb_selfeat)</a>
-<a class="sourceLine" id="cb118-2" data-line-number="2">models&lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Ridge&quot;</span>, <span class="st">&quot;Lasso&quot;</span>, <span class="st">&quot;Elastic Net&quot;</span>, <span class="st">&quot;XGBoost&quot;</span>)</a>
-<a class="sourceLine" id="cb118-3" data-line-number="3">tunning_parameters&lt;-<span class="kw">c</span>(penalty_ridge, penalty_lasso, penalty_net, <span class="st">&quot; &quot;</span>)</a>
-<a class="sourceLine" id="cb118-4" data-line-number="4">nfeatures&lt;-<span class="kw">c</span>(rfeatures, lfeatures, efeatures, borutafeatures)</a>
-<a class="sourceLine" id="cb118-5" data-line-number="5">R_Squared&lt;-<span class="kw">c</span>(ridge_R_squared, lasso_R_squared, net_R_squared, XGB_R_squared)</a>
-<a class="sourceLine" id="cb118-6" data-line-number="6">Cor&lt;-<span class="st"> </span><span class="kw">c</span>(ridge_corr, lasso_corr, net_corr, XGB_corr)</a>
-<a class="sourceLine" id="cb118-7" data-line-number="7">RMSE&lt;-<span class="kw">c</span>(ridge_RMSE, lasso_RMSE, net_RMSE, XGB_RMSE)</a>
-<a class="sourceLine" id="cb118-8" data-line-number="8">KaggleRMSE&lt;-<span class="kw">c</span>(<span class="fl">0.13163</span>, <span class="fl">0.12998</span>, <span class="fl">0.13061</span>, <span class="fl">0.12758</span> )</a>
-<a class="sourceLine" id="cb118-9" data-line-number="9"><span class="kw">kable</span>(<span class="kw">data.frame</span>(<span class="dt">Models=</span>models, <span class="dt">Features=</span>nfeatures,<span class="dt">Corr=</span>Cor,  <span class="dt">Rsquared=</span>R_Squared, <span class="dt">TrainingRMSE =</span> RMSE, <span class="dt">KaggleRMSE=</span>KaggleRMSE))</a></code></pre></div>
 <table>
 <thead>
 <tr>

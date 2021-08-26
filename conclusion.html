@@ -13,7 +13,7 @@
   
   
   
-  <meta name="github-repo" content="https://github.com/yntgmz/House_Prices_Kaggle_Competition" />
+  <meta name="github-repo" content="https://github.com/yntgmz/House_Prices_Kaggle_Competition.git" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="7 Conclusion | House Prices: Advanced Regression Techniques" />
@@ -204,9 +204,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Which are the most relevant features that impact sales price?</li>
 </ol>
 <p>Based on the best performing model, the following features are the top 20 predictors of SalesPrice for the given data.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1">feature_importance_fs &lt;-<span class="st"> </span><span class="kw">xgb.importance</span> (<span class="dt">feature_names =</span> <span class="kw">colnames</span>(dtrain_fs),<span class="dt">model =</span> xgb_mod_fs)</a>
-<a class="sourceLine" id="cb119-2" data-line-number="2"><span class="co">#xgb.plot.importance(importance_matrix = feature_importance_fs[1:20])</span></a>
-<a class="sourceLine" id="cb119-3" data-line-number="3"><span class="kw">xgb.ggplot.importance</span>(<span class="dt">importance_matrix =</span> feature_importance_fs[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>], <span class="dt">rel_to_first =</span> <span class="ot">TRUE</span>)<span class="op">+</span><span class="kw">ggtitle</span>(<span class="st">&quot;XGB Top 20 Features&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1">feature_importance_fs &lt;-<span class="st"> </span><span class="kw">xgb.importance</span> (<span class="dt">feature_names =</span> <span class="kw">colnames</span>(dtrain_fs),<span class="dt">model =</span> xgb_mod_fs)</a>
+<a class="sourceLine" id="cb118-2" data-line-number="2"><span class="co">#xgb.plot.importance(importance_matrix = feature_importance_fs[1:20])</span></a>
+<a class="sourceLine" id="cb118-3" data-line-number="3"><span class="kw">xgb.ggplot.importance</span>(<span class="dt">importance_matrix =</span> feature_importance_fs[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>], <span class="dt">rel_to_first =</span> <span class="ot">TRUE</span>)<span class="op">+</span><span class="kw">ggtitle</span>(<span class="st">&quot;XGB Top 20 Features&quot;</span>)</a></code></pre></div>
 <p><img src="HousePrices_Project1_files/figure-html/unnamed-chunk-12-1.png" width="672" /><a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a></p>
 <p>The most important features for the XGB model were Total Area, Overall Quality, Neighborhood Category, Total Baths and Overall Score. Also, Fireplace Quality, Lot Area, Exterior Quality, GarageCars, Garage Finish, Garage Grade and Central Air had significant impact on sales price.</p>
 <p>So, what does this mean?</p>
@@ -217,18 +217,18 @@ Data Cleaning, data engineering, near zero variance filtering, normalizing the r
 </ol>
 <p>The feature engineering definitely paid off since a few of our transformed features are right up in the top 20 on level of importance at predicting the sales price of homes. Combining the total square footage was successful as was combining the total numbers of baths, total basement square-footage, porch square-footage were also successful (in the top 20). Bining the neighborhoods definitely had an impact since neighborhood category is in the top three predictors for the models. The age category also is in the top 20.
 By performing feature engineering, feature selection, regularization, and transforming the target variable, we can reduce loss and greatly improve the performance.</p>
-<p>Also, the model seems to perform better without removing the 4 outliers in the training set. With outliers removed the best score in Kaggle RMSE is 0.12595, while without removing the outliers the best Kaggle RMSE is 0.12592. These values are for the XGB model, but the results are similar for all the other models attempted here.</p>
+<p>Also, the model seems to perform better without removing the 4 outliers in the training set. With outliers removed the best score in Kaggle RMSE is 0.12758, while without removing the outliers the best Kaggle RMSE is 0.12592. These values are for the XGB model, but the results are similar for all the other models attempted here.</p>
 <ol start="3" style="list-style-type: decimal">
 <li>Which model performs best at predicting price?</li>
 </ol>
-<p>Overall the XGB model performed better both in training and in the final Kaggle prediction score. Also, since the RMSE value during training (0.12117) and the Kaggle prediction RMSE (0.12595) are very close, the model does not seem to be grossly over-fitted.</p>
+<p>Overall the XGB model performed better both in training and in the final Kaggle prediction score.</p>
 <ol start="4" style="list-style-type: decimal">
 <li>Which approach in dealing with multicollinearity yields a better prediction?
 The XGBoost model with feature selection performed better at predicting price than the regularized regression models.</li>
 </ol>
 <p>Finally, in the quest for a better score in this addictive Kaggle competition, I tried something I had read other competitors were doing to improve their scores. They say, that if you average the top performing model’s predictions, you can get a better prediction score on Kaggle.com’s competitions. I tried it, by averaging the predictions from the XGB, Elastic Net, Lasso and GBM models, and it worked. This trick got me into the top 19%, with an RMSE score of 0.12595.</p>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb120-1" data-line-number="1">stacking &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;ID&quot;</span>=test_ID,<span class="st">&quot;SalePrice&quot;</span>=(predictions_XGB_fs<span class="op">+</span>pred_net_test_final<span class="op">+</span>pred_lasso_test_final)<span class="op">/</span><span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb120-2" data-line-number="2"><span class="kw">head</span>(stacking)</a></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1">stacking &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;ID&quot;</span>=test_ID,<span class="st">&quot;SalePrice&quot;</span>=(predictions_XGB_fs<span class="op">+</span>pred_net_test_final<span class="op">+</span>pred_lasso_test_final)<span class="op">/</span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb119-2" data-line-number="2"><span class="kw">head</span>(stacking)</a></code></pre></div>
 <pre><code>##     ID SalePrice
 ## 1 1461  116945.3
 ## 2 1462  159451.5
@@ -236,11 +236,11 @@ The XGBoost model with feature selection performed better at predicting price th
 ## 4 1464  193170.7
 ## 5 1465  191065.4
 ## 6 1466  170273.8</code></pre>
-<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb122-1" data-line-number="1"><span class="kw">write.csv</span>(stacking , <span class="st">&quot;stacked_fs_outl&quot;</span>, <span class="dt">row.names=</span><span class="ot">FALSE</span>) <span class="co">#KAGGLE RMSE: 0.12592</span></a></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" data-line-number="1"><span class="kw">write.csv</span>(stacking , <span class="st">&quot;stacked_fs_outl&quot;</span>, <span class="dt">row.names=</span><span class="ot">FALSE</span>) <span class="co">#KAGGLE RMSE: 0.12592</span></a></code></pre></div>
 </div>
 <div id="future-work" class="section level2">
 <h2><span class="header-section-number">7.2</span> Future Work</h2>
-<p>Two areas that could be improved is the outlier analyis inm the dataset and the search grid for the XGB model.</p>
+<p>Two areas that could be improved is the outlier analyis in the dataset and the search grid for the XGB model.</p>
 </div>
 </div>
 <div class="footnotes">
